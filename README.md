@@ -1,3 +1,3 @@
-# Mail-Delivery-Robot-In-Carleton
+# carleton-mail-delivery-robot
 By Stephen Wicklund & Emily Clarke
 
