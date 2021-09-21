@@ -1,7 +1,6 @@
 # Basic workflow to build all components using docker
 
 name: BUILD
-description: 'Build all components with docker.'
 
 # Controls when the workflow will run
 on:
