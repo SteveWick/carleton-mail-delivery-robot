@@ -45,5 +45,5 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
     outputs:
-    time: # id of output
-    description: ‘The time we greeted you’
+      time: # id of output
+      description: ‘The time we greeted you’
