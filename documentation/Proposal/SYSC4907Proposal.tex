@@ -1,0 +1,200 @@
+% Carleton University SCE 4th Year Project thesis style
+% University of Ottawa MSc thesis style -- modifications to the report style
+% modification of suthesis style of Stanford University
+% Example of use:
+    \documentclass[12pt]{report}
+    \usepackage{amsmath,amssymb,amsthm}
+    \usepackage{SCE4YPTemplate}
+    \usepackage{graphicx}
+    \usepackage{url}
+        %Sections will begin on a new page.
+    \usepackage{titlesec}
+    \newcommand{\sectionbreak}{\clearpage}
+
+    \begin{document}
+    
+    \title{Carleton University
+    \\ Mail Delivery Robot}
+    \author{Stephen Wicklund, Emily Clarke \\{\small Supervised by: Dr. Babak Esfandiari}}
+	    % Remember to use your titles
+	    % Use \copyrightyear{1885} to force a particular year
+	    % for the copyright statement.
+     \copyrightfalse % do not produce a separate copyright page
+		    % otherwise use \copyrighttrue
+%    \figurespagefalse % do not produce a separate figures page
+%    \tablespagefalse  % do not produce a separate tables page
+
+% Here you insert the stuff that comes before the preface
+% Each preface section is contained in a \prefacesection and starts on a
+% new page.  These are numbered using Roman numerals.
+% If there are no such pages, do not remove the \beforepreface command
+% since it creates the title page.
+    \beforepreface
+
+%=================================================================================
+
+%=================================================================================
+
+    \prefaceTOC   % to print the Table of Contents
+    \prefaceLOF   % to print the List of Figures
+    \prefaceLOT   % to print the List of Tables
+
+%=================================================================================
+		            
+    \prefacesection{List of Abbreviations}
+    
+	\begin{tabular}[t]{l@{\hspace*{2cm}}l}
+      VoIP & Voice over Internet protocol \\
+      MRI & Magnetic resonance imaging \\
+    \end{tabular}
+
+%=================================================================================
+
+\endpreface
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Now you proceed in report style with chapters, sections, etc.
+
+\chapter{Introduction}
+
+\section{Objectives}
+ A clear statement of the objectives of the project. This needs to include both measurable functional and non-functional requirements, and a description of how you plan to measure progress towards these objectives.
+ 
+\section{Relationship to Degree Program}
+A discussion of how the project relates to the degree program of each student. A student in undergraduate program X should be able to demonstrably state that their planned role in the project is primarily in relation to X.
+
+\section{Required Skills}
+A discussion of how the group, collectively, has the skills required to undertake the project.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Background}
+A brief background of the project. Background should identify what has been done to address the problem, what the state of the art is, etc.
+ 
+ %=================================================================================
+\chapter{Methods}
+ A brief background of the project. Background should identify what has been done to address the problem, what the state of the art is, etc.
+\section{Project Management}
+\subsection{Timeline}
+A proposed timetable for completion of the project including major intermediate milestones.
+
+\subsection{Project Risks}
+A discussion of possible project risks and mitigation strategies.
+
+\subsection{Required Components}
+A list of special components and facilities that you require.
+
+%=================================================================================
+
+\section{Project Planning and Organization}
+The previous team struggled with closely collaborating on all aspects of the project and integrating individual work together. The result of this is that their completed project is disjointed and it is unclear how to run it all at once. In order to avoid these issues, the following project management specific principles should be met:
+\begin{itemize}
+\itemsep0em 
+    \item Every team member generally understands all aspects of the project
+    \item To-do tasks are clearly laid out and who is currently working on what is visible
+    \item A historical view of progress is available for review
+    \item A strong emphasis on agile development principles
+    \item No completely independent changes
+\end{itemize}
+\subsection{Issue Tracking}
+To ensure all necessary tasks are tracked, every todo item will be created as a GitHub issue. Issues will be assigned to project member(s) so that it is clear who is working on what at which time. In addition, an individual member can quickly filter only their issues. As well, only issues without an assignee can be filtered in order to see if there are any issues that are being ignored or forgotten about. This should decrease the likelihood that important issues are missed and make it much easier to view who is working on what.
+\subsection{Issue Filtering}
+Issues also have the ability to be labelled for quick filtering. One custom label that will be implemented is a “have discussion” label. This will be used during team meetings to quickly pull up a list of what team members want to discuss. This will ensure that issues that need a team discussion won’t be forgotten about and potentially pushed into the future.
+\subsection{Weekly Project Board}
+GitHub issue tracking will be integrated with a weekly GitHub project board. This will show which issues are being worked on for the week in an agile development Kanban view. This is an ideal view for quickly getting an idea of project progress, making it easier and faster to make decisions for what to work on or while reviewing the past week's progress. In addition, we will automate the GitHub project board to match actions in the repository. For example, automatically moving an issue to the “done” column and closing it when the linked pull request is approved and merged. This will reduce project management overhead and free up time to focus on coding. Past boards will remain view-able so project management issues can be identified and solutions implemented on a recurring, agile basis.
+\subsection{Code Review and Collaboration}
+The GitHub repo will be set up to prevent a merge to main without approval from a different team member. This will force code review and increase general understanding of the project for all team members. Importantly, this will prevent only a single team member from having knowledge of a piece of code.
+\subsection{Miscellaneous}
+The project management goal will be for any issue to be worked on by any member interchangeability. It is also vital that our project management strategy is reviewed on a recurring basis to ensure that it is working. As a result, the above guidelines are a starting implementation and will likely change in an agile manner as improvements are discovered.
+
+%=================================================================================
+
+\section{Build Automation System}
+
+Currently, there are five repositories with code for the project.
+\begin{enumerate}
+\itemsep0em 
+\item WebServices-Client
+\item WebServices-Server
+\item Roomba
+\item Distance-from-rssi
+\item Web-App
+\end{enumerate}
+Each requires different dependencies and methods for building. This makes it difficult to develop
+and build the software for all components.
+
+
+\subsection{Repository Structure}
+There isn’t a need to create multiple repositories for different components of the project since no
+component is completely independent of one another. Furthermore, by organizing all
+components into a single repository, we have a “single source of truth”. This will make it easier
+to more closely collaborate, share and verify code, and refactor when needed.
+The organization of the project will be a single mono-repo with each component being a
+top-level directory.
+
+\subsection{Github Actions (Continuous Integration Pipeline)}
+In order to simplify the building process for all software components of the system a github
+actions scheme will be set-up to automate the build process. On a push the github action will
+automatically build all the components using docker. Furthermore, this system can run unit tests
+and integration tests, verifying the code on every push. With this in place, all the components of
+the system can be kept up-to-date and tested continuously.
+\subsection{Docker}
+Docker will be used to package the software components with the libraries and dependencies
+required to run them in any environment. It will allow easy sharing of source code without having
+to set-up or change our development environments. With a DockerFile setup the code of any
+component can be built through the github action scheme or locally
+
+%=================================================================================
+
+\section{Web Application}
+The web application is the user interface for the entire mail delivery system. It should primarily allow users to:
+\begin{itemize}
+\itemsep0em 
+\item Request a delivery robot
+\item Make delivery requests
+\item Monitor delivery requests
+\end{itemize}
+
+The web application should:
+\begin{itemize}
+\itemsep0em 
+\item look polished
+\item be intuitive to users
+\item be secure from malicious activity
+\item be available to users through any web browser
+\item function properly on a mobile device
+\end{itemize}
+\subsection{Angular}
+The web application will be built using Angular, a typescript-based web application framework. 
+\begin{description}
+   \item[PWA] Angular allows for the creation of progressive web apps (PWA) which are applications delivered through the web but intended to deliver app-like experiences across any platform.
+   \item[Code Generation] Angular has many tools for code generation, allowing for rapid creation of polished looking interfaces.
+   \item[Templates] Angular has a powerful template syntax which allows for creation of complex UIs without having to reinvent the wheel at every step.
+\end{description}
+
+%=================================================================================
+
+\section{Robot Operating System}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\bibname}{References}
+\begin{thebibliography}{AAA}
+\bibitem{ABC} T. Me and R. You, "A great result," {\em Wonderful Journal}, vol. 5, no. 9,
+	      pp. 1--11, 1998.
+\bibitem{XYZ} J. Him and K. Her, "An even better result that you won't believe," {\em Best Journal Ever}, vol. 4, no. 8, pp. 55--66, 2002.
+\end{thebibliography}
+% If you have your general bibliography in a separate file mybib
+% and you wish to use the plain style (see BIBTeX)
+%    \bibliographystyle{cacm}
+%    \bibliography{mybib}
+    \addcontentsline{toc}{chapter}{\bibname}
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Add appendices now.
+\appendix
+
+
+\end{document}
