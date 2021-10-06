@@ -59,8 +59,17 @@
 \chapter{Introduction}
 
 \section{Objectives}
- A clear statement of the objectives of the project. This needs to include both measurable functional and non-functional requirements, and a description of how you plan to measure progress towards these objectives.
- 
+\subsection{Overview of Functional Requirements}
+\subsection{Overview of Non-Functional Requirements}
+
+\subsection{System Power \& Charging}
+ The system will be able to run wirelessly through batteries onboard the robot. These batteries will be able to be recharged autonomously when the robot returns to the station. Minimizing down-time and allowing the robot to charge when at any station autonomously will allow the robot to maximize the time it is able to deliver mail.
+\subsection{Beacon Navigation}
+The robot will be able to determine a general location based on the signals from nearby active beacons. The robot does not need to be able to determine a specific geographic location, but should be able to make correct navigation decisions based on this information. The beacons are actively powered, therefore continuous operation of the system requires replacement of the batteries in the beacons. The required maintenance of the system can be minimized by detecting dysfunctional or low on battery beacons early and autonomously through the robots. Furthermore, the amount of beacons used will be kept to a minimum to reduce the initial cost of installation and upkeep.
+\subsection{Tunnel Navigation}
+The robot will be able to successfully navigate from point A in the tunnels to point B. This involves creating a path from point A to point B based on a map and making the correct turns at tunnel junctions.
+\subsection{User Interface}
+ A user should be able to request delivery robots, make requests for the robot to deliver mail, and monitor delivery requests through a web-based application.
 \section{Relationship to Degree Program}
 A discussion of how the project relates to the degree program of each student. A student in undergraduate program X should be able to demonstrably state that their planned role in the project is primarily in relation to X.
 
@@ -125,7 +134,7 @@ and build the software for all components.
 
 
 \subsection{Repository Structure}
-There isn’t a need to create multiple repositories for different components of the project since no
+There is not a need to create multiple repositories for different components of the project since no
 component is completely independent of one another. Furthermore, by organizing all
 components into a single repository, we have a “single source of truth”. This will make it easier
 to more closely collaborate, share and verify code, and refactor when needed.
@@ -133,8 +142,8 @@ The organization of the project will be a single mono-repo with each component b
 top-level directory.
 
 \subsection{Github Actions (Continuous Integration Pipeline)}
-In order to simplify the building process for all software components of the system a github
-actions scheme will be set-up to automate the build process. On a push the github action will
+In order to simplify the building process for all software components of the system a GitHub
+actions scheme will be set-up to automate the build process. On a push the GitHub action will
 automatically build all the components using docker. Furthermore, this system can run unit tests
 and integration tests, verifying the code on every push. With this in place, all the components of
 the system can be kept up-to-date and tested continuously.
@@ -142,7 +151,7 @@ the system can be kept up-to-date and tested continuously.
 Docker will be used to package the software components with the libraries and dependencies
 required to run them in any environment. It will allow easy sharing of source code without having
 to set-up or change our development environments. With a DockerFile setup the code of any
-component can be built through the github action scheme or locally
+component can be built through the GitHub action scheme or locally
 
 %=================================================================================
 
