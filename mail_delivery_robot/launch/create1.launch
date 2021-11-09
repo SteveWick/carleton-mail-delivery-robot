@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <launch>
-    <node name="actionTranslator.py" pkg="mail_delivery_robot" type="control"/>
+    <node name="actionTranslator" pkg="mail_delivery_robot" type="actionTranslator.py"/>
 </launch>
