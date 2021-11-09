@@ -122,7 +122,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/mail_delivery_robot.cpp
+#   src/carleton-mail-delivery-robot/${PROJECT_NAME}/mail_delivery_robot.cpp
 # )
 
 ## Add cmake target dependencies of the library
