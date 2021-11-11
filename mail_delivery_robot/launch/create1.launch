@@ -11,6 +11,17 @@
     
     <node name="actionTranslator" pkg="mail_delivery_robot" type="actionTranslator.py"/>
     <node name="IRSensor" pkg="mail_delivery_robot" type="IRDistanceCalc.py"/>
+    <!-- <node name="bumperBoy" pkg="mail_delivery_robot" type="bumperSensor.py"/> -->
+
+    <node name="robotDriver" pkg="mail_delivery_robot" type="robotDriver.py"/>
+    <node name="handleCollision" pkg="mail_delivery_robot" type="handleCollision.py"/>
+
+    <node name="updateStatus" pkg="mail_delivery_robot" type="updateStatus.py"/>
+    <node name="receiveRequest" pkg="mail_delivery_robot" type="receiveRequest.py"/>
+
+    <node name="plotNavigation" pkg="mail_delivery_robot" type="plotNavigation.py"/>
+    <node name="captain" pkg="mail_delivery_robot" type="captain.py"/>
+
 
 
   <!-- Robot description -->
