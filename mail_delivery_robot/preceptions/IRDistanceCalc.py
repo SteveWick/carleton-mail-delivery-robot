@@ -8,14 +8,34 @@
 import time
 import math
 from std_msgs.msg import String
-import rospy
+import rclpy
+from rclpy.node import Node
 import sys
+import Adafruit_ADS1x15
+
+
+class IRSensor(Node):
+    def __init__(self):
+        super().__init__('ir_sensor')
+        self.publisher_ = self.create_publisher(String, 'perceptions' , 10)
+        timer_period = 0.2 #Seconds
+        self.timer = self.create_timer(timer_period, self.sendReading)
+
+    def sendReading(self):
+        calc = String()
+        # calc = calculate()
+        calc.data = str(calculate())
+        self.get_logger().debug('Publishing: "%s"' % calc)
+        if calc.data == -1:
+            pass
+        else:
+            self.publisher_.publish(calc)
+            pass
 
 # This script takes in inputs from an analog to digital converter connected to IR sensors and converts to cm before
 #     using the two distance measurements to calculate the robot's distance from the wall. It sends wall distance to perceptions node.
 
 # Import the ADS1x15 module.
-import Adafruit_ADS1x15
 
 # Create an ADS1115 ADC (16-bit) instance.
 adc = Adafruit_ADS1x15.ADS1115()
@@ -26,9 +46,9 @@ avg2 = 0
 # See table 3 in the ADS1015/ADS1115 datasheet for more info on gain.
 GAIN = 2
 
-def test():
-    #this is just a test function to pass set values to check math
-    distance(5.5, 7.25)
+# def test():
+#     #this is just a test function to pass set values to check math
+#     distance(5.5, 7.25)
 
 def distance(dis1, dis2):
     #the two distance reading are passed to this from the sensors (in cm)
@@ -96,22 +116,25 @@ def calculate():
     
     return -1
     
-def rosMain():
-    rospy.init_node('IRSensor', anonymous=True)
-    publisher = rospy.Publisher('perceptions', String, queue_size=10)
-    rate = rospy.Rate(5)
+def main():
+    rclpy.init()
+    irsensor = IRSensor()
+
+    rclpy.spin(irsensor)
     
-    while not rospy.is_shutdown():
-        calc = calculate()
-        if calc == -1:
-            pass
-        else:
-            publisher.publish(calc)
-        rate.sleep()
+    # publisher = rclpy.Publisher('perceptions', String, queue_size=10)
+    # rate = rclpy.Rate(5)
+    
+    # while not rclpy.is_shutdown():
+    #     # calc = calculate()
+    #     calc = 1
+    #     if calc == -1:
+    #         pass
+    #     else:
+    #         publisher.publish(calc)
+    #     rate.sleep()
+
 
 if __name__ == '__main__':
-    try:
-        rosMain()
-    except rospy.ROSInterruptException:
-        pass
+    main()
 

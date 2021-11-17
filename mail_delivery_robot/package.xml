@@ -4,7 +4,7 @@
   <name>mail_delivery_robot</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="ubuntu@todo.todo">ubuntu</maintainer>
+  <maintainer email="stevewicklund@gmail.com">Stephen Wicklund</maintainer>
   <license>TODO: License declaration</license>
 
   <test_depend>ament_copyright</test_depend>
@@ -15,4 +15,8 @@
   <export>
     <build_type>ament_python</build_type>
   </export>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>Adafruit-ADS1x15</exec_depend>
+
 </package>
