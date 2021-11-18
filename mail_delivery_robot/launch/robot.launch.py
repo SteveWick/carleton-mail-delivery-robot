@@ -16,7 +16,9 @@ def generate_launch_description():
              output="screen",
              parameters=[{
                  "robot_model": LaunchConfiguration('robot_model')
-             }]
+             }],
+            remappings=[
+             ('/cmd_vel', '/control/cmd_vel')]
              ),
         Node(package='mail_delivery_robot',
             namespace='preceptions',
@@ -28,5 +30,12 @@ def generate_launch_description():
             namespace='control',
             executable='action_translator',
             name='action_translator',
+            ),
+        Node(package='mail_delivery_robot',
+            namespace='control',
+            executable='robot_driver',
+            name='robot_driver',
+            remappings=[
+             ('/control/navigationMap', '/navigationMap')]
             ),
     ])

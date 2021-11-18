@@ -1,26 +1,29 @@
 #!/usr/bin/env python
 # @author: Stephen Wicklund
 
-# SUBSCRIBER:   Navigation
-# PUBLISHER:    NavigationMap
-import rospy
+# SUBSCRIBER:   
+# PUBLISHER:    navigationMap
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import String
+class Captain(Node):
+    def __init__(self):
+        super().__init__('captain')
+        self.mapPublisher = self.create_publisher(String,'navigationMap', 10)
 
-def rosMain():
-    rospy.init_node('captain', anonymous=True)
-    publisher = rospy.Publisher('actions', String, queue_size=10)
-    rate = rospy.Rate(5)
-    
-    while not rospy.is_shutdown():
-        command = -1
-        if command == -1:
-            pass
-        else:
-            publisher.publish(command)
-        rate.sleep()
+
+def main():
+    rclpy.init()
+    captain = Captain()
+    # rclpy.spin(captain)
+
+    while(True):
+        mapUpdate = String()
+        mapUpdate.data = input("Enter a navigational update: ")
+        captain.mapPublisher.publish(mapUpdate)
+        captain.get_logger().debug('Publishing: "%s"' % mapUpdate.data)
+
+
 
 if __name__ == '__main__':
-    try:
-        rosMain()
-    except rospy.ROSInterruptException:
-        pass
+    main()

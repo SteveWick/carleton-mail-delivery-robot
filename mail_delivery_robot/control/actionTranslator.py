@@ -23,17 +23,16 @@ class ActionTranslator(Node):
         self.undockPublisher = self.create_publisher(Empty,'dock',1)
         self.dockPublisher = self.create_publisher(Empty,'undock',1)
 
-        self.subsction = self.create_subscription(String,'actions',self.decodeAction,10)
+        self.subscription = self.create_subscription(String,'actions',self.decodeAction,10)
 
 
     # Decode and execute the action
-    def decodeAction(self, data, args):
+    def decodeAction(self, data):
         actionMessage = Twist() #the mess
 
         # Get the parameters
         action = str(data.data)
-        (drivePublisher, dockPublisher, undockPublisher) = args
-        self.get_logger().info("Action: " + action)
+        # (drivePublisher, dockPublisher, undockPublisher) = args
         
         #handle basic movement commands from actions topic
         actionMessage = getTwistMesg(action)
@@ -41,20 +40,21 @@ class ActionTranslator(Node):
             actionMessage = getTwistMesg("left")
             tmp = String()
             tmp.data = "stop"
-            decodeAction(tmp, args)
             self.drivePublisher.publish(actionMessage)
+            self.get_logger().info("Action: left")
+
         elif(action == "right"): #Does 45 degree turn right (stops robot first)
             actionMessage = getTwistMesg("right")
             tmp = String()
             tmp.data = "stop"
-            decodeAction(tmp, args)
             self.drivePublisher.publish(actionMessage)
+            self.get_logger().info("Action: right")
 
         # Handle the docking station cases
         if action == "dock":
-            self.dockPublisher.publish()
+            self.dockPublisher.publish(Empty())
         elif action == 'undock':
-            self.undockPublisher.publish()
+            self.undockPublisher.publish(Empty())
         else:
             #publish action
             self.drivePublisher.publish(actionMessage)
@@ -77,16 +77,16 @@ def getTwistMesg(action):
     
     if action == "forward":
         message.linear.x = 0.1
-        message.angular.z = 0
+        message.angular.z = 0.0
     elif action == "backward":
         message.linear.x = -0.2
-        message.linear.z = 0
+        message.linear.z = 0.0
     elif action == "left":
-        message.linear.x = 0
-        message.angular.z = 4
+        message.linear.x = 0.0
+        message.angular.z = 4.0
     elif action == "right":
-        message.linear.x = 0
-        message.angular.z = -4
+        message.linear.x = 0.0
+        message.angular.z = -4.0
     elif action == "sleft":
         message.linear.x = 0.05
         message.angular.z = 0.5
@@ -100,8 +100,8 @@ def getTwistMesg(action):
         message.linear.x = -0.1
         message.angular.z = 0.5
     elif action == "stop":
-        message.linear.x = 0
-        message.angular.z = 0
+        message.linear.x = 0.0
+        message.angular.z = 0.0
     
     return message
 
