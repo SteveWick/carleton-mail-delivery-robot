@@ -5,7 +5,8 @@
 # SUBSCRIBER:   none
 # PUBLISHER:    String object to 'beacons' node
 
-import rospy
+import rclpy
+from rclpy.node import Node
 from bluepy.btle import Scanner
 from std_msgs.msg import String
 from reader import BeaconReader
@@ -57,7 +58,7 @@ def __calc_average(mac, distance):
         return True
     return False
 
-def rosMain():
+def main():
     global averages
     
     pub = rospy.Publisher('beacons', String, queue_size=5)
@@ -131,10 +132,7 @@ def rosMain():
                 pub.publish(to_send)
 
 if __name__ == '__main__':
-    try:
-        rosMain()
-    except rospy.ROSInterruptException:
-        pass
+    main()
 
 
 

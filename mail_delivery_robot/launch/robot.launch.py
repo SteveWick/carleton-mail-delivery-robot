@@ -24,7 +24,8 @@ def generate_launch_description():
             namespace='preceptions',
             executable='IRSensor',
             name='IRSensor',
-            output="log"
+            output="log",
+            remappings=[('/preceptions/preceptions', '/control/preceptions')]
             ),
         Node(package='mail_delivery_robot',
             namespace='control',

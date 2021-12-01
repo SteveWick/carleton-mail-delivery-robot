@@ -17,7 +17,7 @@ import Adafruit_ADS1x15
 class IRSensor(Node):
     def __init__(self):
         super().__init__('ir_sensor')
-        self.publisher_ = self.create_publisher(String, 'perceptions' , 10)
+        self.publisher_ = self.create_publisher(String, 'preceptions' , 10)
         timer_period = 0.2 #Seconds
         self.timer = self.create_timer(timer_period, self.sendReading)
 
@@ -68,7 +68,8 @@ def distance(dis1, dis2):
     if dis1 < 10.21 or dis2 < 10.21:
         b=1
         
-    out = "distance: " + str(abs(b)) + " angle: " + str(180 - A)
+    # out = "distance: " + str(abs(b)) + " angle: " + str(180 - A)
+    out = str(abs(b)) +"," +str(180 - A)
     print(out)
     return out
     
@@ -122,17 +123,6 @@ def main():
 
     rclpy.spin(irsensor)
     
-    # publisher = rclpy.Publisher('perceptions', String, queue_size=10)
-    # rate = rclpy.Rate(5)
-    
-    # while not rclpy.is_shutdown():
-    #     # calc = calculate()
-    #     calc = 1
-    #     if calc == -1:
-    #         pass
-    #     else:
-    #         publisher.publish(calc)
-    #     rate.sleep()
 
 
 if __name__ == '__main__':
