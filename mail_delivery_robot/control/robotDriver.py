@@ -109,6 +109,7 @@ DriverStateMachine.findWall = FindWall()
 DriverStateMachine.findWallSpin = FindWallSpin()
 DriverStateMachine.wallFollowFar = WallFollowFar()
 
+DEBUG = True
 class RobotDriver(Node):
     def __init__(self):
         super().__init__('robot_driver')
@@ -124,6 +125,7 @@ class RobotDriver(Node):
         self.timer = self.create_timer(timer_period, self.determineAction)
         self.driverStateMachine = DriverStateMachine(DriverStateMachine.dock)
 
+
     def determineAction(self):
         action = self.driverStateMachine.run(self.distance,self.angle,self.captainRequest)
         self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
@@ -132,7 +134,12 @@ class RobotDriver(Node):
         if(action.data != 0):
             self.get_logger().info("Publishing: " + action.data)
             self.actionPublisher.publish(action)
-    
+            
+            if DEBUG:
+                f = open("driverLog.csv", "a")
+                f.write(self.driverStateMachine.currentState.toString()+","+str(self.distance)+","+str(self.angle)+","+str(action.data)+"\n")
+                f.close()
+        
     def updateMapState(self, data):
         self.captainRequest = data.data
         self.get_logger().info("Captain: " + self.captainRequest)
