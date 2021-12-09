@@ -28,6 +28,12 @@ def generate_launch_description():
             remappings=[('/preceptions/preceptions', '/control/preceptions')]
             ),
         Node(package='mail_delivery_robot',
+            namespace='preceptions',
+            executable='beacon_reader',
+            name='beacon_reader',
+            remappings=[('/preceptions/beacons', '/navigation/beacons')]
+            ),
+        Node(package='mail_delivery_robot',
             namespace='control',
             executable='action_translator',
             name='action_translator',
@@ -39,4 +45,8 @@ def generate_launch_description():
             remappings=[
              ('/control/navigationMap', '/navigationMap')]
             ),
+        Node(package='mail_delivery_robot',
+            namespace='navigation',
+            executable='captain',
+            name='captain')
     ])

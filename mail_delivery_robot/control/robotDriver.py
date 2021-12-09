@@ -109,11 +109,11 @@ DriverStateMachine.findWall = FindWall()
 DriverStateMachine.findWallSpin = FindWallSpin()
 DriverStateMachine.wallFollowFar = WallFollowFar()
 
-DEBUG = True
+DEBUG = False
 class RobotDriver(Node):
     def __init__(self):
         super().__init__('robot_driver')
-        self.driveState = "dock"
+        self.driveState = "undock"
         self.lastAction = self.driveState
         self.distance = 0.0
         self.angle = 0.0
@@ -123,7 +123,7 @@ class RobotDriver(Node):
         self.mapSubscriber = self.create_subscription(String,'navigationMap', self.updateMapState,10)
         timer_period = 0.2 #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.dock)
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.findWall)
 
 
     def determineAction(self):
@@ -136,7 +136,7 @@ class RobotDriver(Node):
             self.actionPublisher.publish(action)
             
             if DEBUG:
-                f = open("driverLog.csv", "a")
+                f = open('/var/log/mailDeliveryRobot/driverLog.csv', "a")
                 f.write(self.driverStateMachine.currentState.toString()+","+str(self.distance)+","+str(self.angle)+","+str(action.data)+"\n")
                 f.close()
         
@@ -153,7 +153,7 @@ class RobotDriver(Node):
         if(data.data != "-1"):
             self.distance = data.data.split(",")[0]
             self.angle = data.data.split(",")[1]
-        self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
+        # self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
 
 
 def main():
