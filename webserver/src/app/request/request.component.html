@@ -1,0 +1,14 @@
+<!-- <h2>{{request.source}} to {{request.destination}}</h2>
+<div><span>id: </span>{{request.id}}</div>
+<div><span>timestamp: </span>{{request.timestamp}}</div>
+<div><span>from: </span>{{request.sender}}</div>
+<div>
+    <label for="name">Recipient: </label>
+    <input id="name" [(ngModel)]="request.recipient" placeholder="name">
+  </div> -->
+<h2>Requests</h2>
+<ul class="requests">
+<li *ngFor="let request of requests">
+    <span class="id">ID: {{request.id}}</span> {{request.source}} ({{request.sender}}) -> {{request.destination}} ({{request.recipient}})   {{request.timestamp.toISOString()}}
+</li>
+</ul>

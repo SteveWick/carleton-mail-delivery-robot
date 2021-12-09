@@ -1,0 +1,70 @@
+  <div class="container">
+    <div [hidden]="submitted">
+      <h1>New Request</h1>
+      <form (ngSubmit)="onSubmit()" #requestForm="ngForm">
+        <div class="form-group">
+          <label for="sender">Sender</label>
+          <input type="text" class="form-control" id="sender"
+                 required
+                 [(ngModel)]="model.sender" name="sender"
+                 #sender="ngModel">
+          <div [hidden]="sender.valid || sender.pristine"
+               class="alert alert-danger">
+               Sender name is required
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="recipient">Recipient</label>
+          <input type="text" class="form-control" id="recipient"
+                 required
+                 [(ngModel)]="model.recipient" name="recipient"
+                 #recipient="ngModel">
+            <div [hidden]="recipient.valid || recipient.pristine"
+                 class="alert alert-danger">
+                 Recipient name is required
+            </div>
+        </div>
+  
+        <div class="form-group">
+            <label for="source">Source</label>
+          <select class="form-control" id="source"
+                  required
+                  [(ngModel)]="model.source" name="source"
+                  #source="ngModel">
+            <option *ngFor="let location of locations" [value]="location">{{location}}</option>
+          </select>
+          <div [hidden]="source.valid || source.pristine" class="alert alert-danger">
+            Source location is required
+          </div>
+        </div>
+
+        <div class="form-group">
+            <label for="destination">Destination</label>
+          <select class="form-control" id="destination"
+                  required
+                  [(ngModel)]="model.destination" name="destination"
+                  #destination="ngModel">
+            <option *ngFor="let location of locations" [value]="location">{{location}}</option>
+          </select>
+          <div [hidden]="destination.valid || destination.pristine" class="alert alert-danger">
+            Source location is required
+          </div>
+        </div>
+  
+        <button type="submit" class="btn btn-success" (click)="submitRequest();" [disabled]="!requestForm.form.valid">Submit</button>
+      </form>
+    </div>
+  
+    <div [hidden]="!submitted">
+      <h2>You submitted the following:</h2>
+      <p>ID: {{ model.id }}</p>
+      <p>Timestamp: {{ model.timestamp.toISOString() }}</p>
+      <p>Sender: {{ model.sender }}</p>
+      <p>Recipient: {{ model.recipient }}</p>
+      <p>Source: {{ model.source }}</p>
+      <p>Destination: {{ model.destination }}</p>
+      <br>
+      <button type="button" class="btn btn-default" (click)="submitted=false; newRequest();">New Request</button>
+    </div>
+  </div>
