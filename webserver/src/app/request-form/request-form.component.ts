@@ -12,7 +12,7 @@ export class RequestFormComponent implements OnInit {
 
   locations = ['UC', 'MC', 'CB', 'ME'];
 
-  model = new MailRequest(1005, new Date(0), 'UC', 'MC', 'Alice', 'Bob');
+  model = new MailRequest(1005, -1, new Date(0), 'UC', 'MC', 'Alice', 'Bob', 'new');
 
   id: number = -1;
 
@@ -27,7 +27,7 @@ export class RequestFormComponent implements OnInit {
   onSubmit() { this.submitted = true; }
 
   newRequest() {
-    this.model = new MailRequest(-1, new Date(0), 'UC', 'MC', 'Alice', 'Bob');
+    this.model = new MailRequest(-1, -1, new Date(0), 'UC', 'MC', 'Alice', 'Bob', 'new');
   }
 
   submitRequest() {

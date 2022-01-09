@@ -9,6 +9,6 @@
 <h2>Requests</h2>
 <ul class="requests">
 <li *ngFor="let request of requests">
-    <span class="id">ID: {{request.id}}</span> {{request.source}} ({{request.sender}}) -> {{request.destination}} ({{request.recipient}})   {{request.timestamp.toISOString()}}
+    <span class="id">ID: {{request.id}}</span> {{request.source}} ({{request.sender}}) -> {{request.destination}} ({{request.recipient}})   {{request.timestamp.toISOString()}}  robot: {{request.robot}}  state: {{request.state}}
 </li>
 </ul>

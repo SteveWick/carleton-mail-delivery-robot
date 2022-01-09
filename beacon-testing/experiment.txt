@@ -1,0 +1,48 @@
+Static RSSI to meters
+
+Experiment design:
+- Place the Raspberry Pi in a static location on one end of a hallway
+- Run a script to collect rolling average for the RSSI of a target beacon
+- Place the beacon at several known distances away from the Raspberry Pi
+- Record rolling average measurement with the beacon at the same level as the robot and a second as close to ceiling level as possible at a known height
+    - Pause between measurements for the rolling average to settle
+- Repeat for a second beacon
+
+Analysis:
+- Compare RSSI values to known distances, paying close attention to the height differences
+- 
+
+Results:
+
+1m height difference, next to metal window
+
+Beacon 1
+Distance, floor time, floor rssi, ceiling time, ceiling rssi
+1m,12:01:53,-43,12:02:36,-60
+2.5m,12:03:31,-58,12:04:30,-59
+4m,12:05:35,-65,12:06:35,-70
+
+
+Middle of hallway no height differences
+
+Beacon 1 (c2a8)
+Distance, floor time, floor rssi
+1m,12:15:26,-58
+2.5m,12:16:21,-65
+4m,12:17:07,-70
+5.5m,12:18:38,-67
+7m,12:20:22,-71
+8.5m,12:22:11,-75
+10m,12:24:09,-68
+11.5m,12:26:27,-71
+
+Beacon 2 (1ed7)
+Distance, floor time, floor rssi
+1m,12:31:16,-55
+2.5m,12:32:02,-67
+4m,12:34:00,-68
+5.5m,12:35:27,-77
+7m,12:36:53,-74
+8.5m,12:37:45,-75
+10m,12:38:34,-72
+11.5m,12:39:31,-80

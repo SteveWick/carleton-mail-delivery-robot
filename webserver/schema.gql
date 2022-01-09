@@ -1,0 +1,36 @@
+type Request {
+    id: Int! @id
+    robot: Int
+    timestamp: String!
+    source: String!
+    destination: String!
+    sender: String!
+    recipient: String!
+    state: String!
+}
+
+type User {
+    username: String! @id
+    email: String!
+}
+
+type Robot {
+    id: Int! @id
+    location: String
+    status: String
+}
+
+type Beacon {
+    id: Int! @id
+    location: String
+    status: String
+}
+
+type Query {
+    allRequests: [Request!]
+    allUsers: [User!]
+    allRobots: [Robot!]
+    allBeacons: [Beacon!]
+    requestsByState(state: String!): [Request!]
+}
+
