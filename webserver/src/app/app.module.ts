@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { RequestFormComponent } from './request-form/request-form.component';
 import { MessagesComponent } from './messages/messages.component'
 import { HttpClientModule } from '@angular/common/http';
+import { GraphQLModule } from './graphql.module';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    GraphQLModule
   ],
   providers: [],
   bootstrap: [AppComponent]

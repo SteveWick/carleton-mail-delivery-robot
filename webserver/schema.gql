@@ -1,3 +1,9 @@
+type Bid {
+    robot: Int  
+    distance: Int
+    request: Request
+}
+
 type Request {
     id: Int! @id
     robot: Int
@@ -7,6 +13,10 @@ type Request {
     sender: String!
     recipient: String!
     state: String!
+    age: String
+    bidExpirary: String
+    priority: Int
+    bids: [Bid]
 }
 
 type User {

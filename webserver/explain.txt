@@ -1,0 +1,16 @@
+bottom line, server doesnt do shit
+
+notfications maybe
+-->cloudflare workers
+
+robot is idle
+1. polls database for availble requests
+2. If available request -> mark as taken
+3. Handle request
+
+mark as taken request needs to reply either success or fail if other robot grabs first
+
+
+1. query available requests
+2. mark request as taken   
+    --> 
