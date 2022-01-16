@@ -6,6 +6,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+import time
 
 class DriverStateMachine:
     def __init__(self, initialState):
@@ -113,7 +114,7 @@ DEBUG = False
 class RobotDriver(Node):
     def __init__(self):
         super().__init__('robot_driver')
-        self.driveState = "undock"
+        self.driveState = "dock"
         self.lastAction = self.driveState
         self.distance = 0.0
         self.angle = 0.0
@@ -123,7 +124,7 @@ class RobotDriver(Node):
         self.mapSubscriber = self.create_subscription(String,'navigationMap', self.updateMapState,10)
         timer_period = 0.2 #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.findWall)
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.dock)
 
 
     def determineAction(self):
@@ -137,7 +138,7 @@ class RobotDriver(Node):
             
             if DEBUG:
                 f = open('/var/log/mailDeliveryRobot/driverLog.csv', "a")
-                f.write(self.driverStateMachine.currentState.toString()+","+str(self.distance)+","+str(self.angle)+","+str(action.data)+"\n")
+                f.write(self.driverStateMachine.currentState.toString()+","+str(self.distance)+","+str(self.angle)+","+str(action.data)+","+ str(time.time()) + "\n")
                 f.close()
         
     def updateMapState(self, data):
