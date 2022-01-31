@@ -43,7 +43,7 @@ def generate_launch_description():
             executable='robot_driver',
             name='robot_driver',
             remappings=[
-             ('/control/navigationMap', '/navigationMap')]
+             ('/control/navigationMap', '/navigation/navigationMap')]
             ),
         Node(package='mail_delivery_robot',
             namespace='navigation',

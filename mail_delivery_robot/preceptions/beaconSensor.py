@@ -28,21 +28,25 @@ class BeaconReader(Node):
         for beacon in self.beacons:
             self.get_logger().info(beacon)
         self.publisher_ = self.create_publisher(String, 'beacons' , 10)
-        timer_period = 1.0 #Seconds
+        timer_period = 0.5 #Seconds
         self.timer = self.create_timer(timer_period, self.checkForBeacons)
         self.scanner = Scanner().withDelegate(ScanDelegate())
  
 
     def checkForBeacons(self):
-        self.get_logger().info("Checking for beacons!")
-        devices = self.scanner.scan(0.9)
+        devices = self.scanner.scan(0.4)
         beaconData = String()
         for dev in devices:
             for beacon in self.beacons:
                 if(self.beacons[beacon] == dev.addr):
-                    self.get_logger().info("Device {} ({}), RSSI={} dB".format(dev.addr, dev.addrType, dev.rssi))
+                    self.get_logger().debug("Device {} ({}), RSSI={} dB".format(dev.addr, dev.addrType, dev.rssi))
                     beaconData.data = beacon + "," + str(dev.rssi)
                     self.publisher_.publish(beaconData)
+                    if True:
+                        f = open('captainLog.csv', "a")
+                        f.write(beaconData.data +"\n")
+                        f.close()
+
 
 
 def main():

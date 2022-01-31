@@ -89,6 +89,8 @@ class WallFollow(DriverState):
             self.counter = 0
         return action 
     def next(self,distance,angle,captainRequest):
+        if(captainRequest == "rturn" and (float(distance) > 20.0)):
+            return DriverStateMachine.rightTurn
         return DriverStateMachine.wallFollow
     def toString(self):
         return "WallFollow"
@@ -103,12 +105,33 @@ class WallFollowFar(DriverState):
     def toString(self):
         return "WallFollowFar"
 
+class RightTurn(DriverState):
+    def run(self,distance,angle):
+        action = String()
+        
+        if(self.counter < 3):
+            action.data = "right"
+        elif(self.counter < 5):
+            action.data = "forward"
+        self.counter += 1
+        return action 
+    def next(self,distance,angle,captainRequest):
+        if(self.counter > 5):
+            return DriverStateMachine.wallFollow
+        else:
+            captainRequest = ""
+            return DriverStateMachine.rightTurn
+        
+    def toString(self):
+        return "RightTurn"
+
 #Initialize states
 DriverStateMachine.dock = Dock()
 DriverStateMachine.wallFollow = WallFollow()
 DriverStateMachine.findWall = FindWall()
 DriverStateMachine.findWallSpin = FindWallSpin()
 DriverStateMachine.wallFollowFar = WallFollowFar()
+DriverStateMachine.rightTurn = RightTurn()
 
 DEBUG = False
 class RobotDriver(Node):
@@ -124,16 +147,16 @@ class RobotDriver(Node):
         self.mapSubscriber = self.create_subscription(String,'navigationMap', self.updateMapState,10)
         timer_period = 0.2 #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.dock)
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.findWall)
 
 
     def determineAction(self):
         action = self.driverStateMachine.run(self.distance,self.angle,self.captainRequest)
-        self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
-        self.get_logger().info("Distance: " + str(self.distance))
+        self.get_logger().debug("DriverState: " + self.driverStateMachine.currentState.toString())
+        self.get_logger().debug("Distance: " + str(self.distance))
 
         if(action.data != 0):
-            self.get_logger().info("Publishing: " + action.data)
+            self.get_logger().debug("Publishing: " + action.data)
             self.actionPublisher.publish(action)
             
             if DEBUG:
