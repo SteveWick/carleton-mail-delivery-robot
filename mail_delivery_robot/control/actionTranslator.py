@@ -83,10 +83,10 @@ def getTwistMesg(action):
         message.linear.z = 0.0
     elif action == "left":
         message.linear.x = 0.0
-        message.angular.z = 4.0
+        message.angular.z = 3.5
     elif action == "right":
         message.linear.x = 0.0
-        message.angular.z = -4.0
+        message.angular.z = -3.5
     elif action == "sleft":
         message.linear.x = 0.05
         message.angular.z = 0.5
