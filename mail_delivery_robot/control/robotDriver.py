@@ -12,8 +12,9 @@ class DriverStateMachine:
     def __init__(self, initialState):
         self.currentState = initialState
     def run(self, distance,angle,captainRequest):
-        self.currentState = self.currentState.next(distance,angle, captainRequest)
         return self.currentState.run(distance,angle)
+    def next(self,distance,angle,captainRequest):
+        self.currentState = self.currentState.next(distance,angle,captainRequest)
 
 class DriverState:
     counter = 0
@@ -89,21 +90,31 @@ class WallFollow(DriverState):
             self.counter = 0
         return action 
     def next(self,distance,angle,captainRequest):
-        if(captainRequest == "rturn" and (float(distance) > 20.0)):
-            return DriverStateMachine.rightTurn
+        if(captainRequest == "rturn"):
+            return DriverStateMachine.rightTurnApproach
         return DriverStateMachine.wallFollow
     def toString(self):
         return "WallFollow"
-
-class WallFollowFar(DriverState):
+    
+class RightTurnApproach(DriverState):
     def run(self,distance,angle):
         action = String()
-        action.data = "0"
+        if((float(distance) > 20.0 or float(angle) > 120.0) and self.counter % 5 == 0):
+            self.counter += 1
+            action.data = "sright"
+        elif((float(distance) < 10.0 or float(angle) < 60.0) and self.counter % 5 == 0):
+            self.counter += 1
+            action.data = "sleft"
+        else:    
+            action.data = "forward"
+            self.counter = 0
         return action 
     def next(self,distance,angle,captainRequest):
-        pass
+        if((float(distance) > 20.0)):
+            return DriverStateMachine.rightTurn
+        return DriverStateMachine.wallFollow
     def toString(self):
-        return "WallFollowFar"
+        return "RightTurnApproach"
 
 class RightTurn(DriverState):
     def run(self,distance,angle):
@@ -130,15 +141,13 @@ DriverStateMachine.dock = Dock()
 DriverStateMachine.wallFollow = WallFollow()
 DriverStateMachine.findWall = FindWall()
 DriverStateMachine.findWallSpin = FindWallSpin()
-DriverStateMachine.wallFollowFar = WallFollowFar()
+DriverStateMachine.rightTurnApproach = RightTurnApproach()
 DriverStateMachine.rightTurn = RightTurn()
 
 DEBUG = False
 class RobotDriver(Node):
     def __init__(self):
         super().__init__('robot_driver')
-        self.driveState = "dock"
-        self.lastAction = self.driveState
         self.distance = 0.0
         self.angle = 0.0
         self.captainRequest = 0
@@ -166,6 +175,7 @@ class RobotDriver(Node):
         
     def updateMapState(self, data):
         self.captainRequest = data.data
+        self.driverStateMachine.next(self.distance,self.angle,self.captainRequest)
         self.get_logger().info("Captain: " + self.captainRequest)
 
 
@@ -177,6 +187,7 @@ class RobotDriver(Node):
         if(data.data != "-1"):
             self.distance = data.data.split(",")[0]
             self.angle = data.data.split(",")[1]
+            self.driverStateMachine.next(self.distance,self.angle,self.captainRequest)
         # self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
 
 
