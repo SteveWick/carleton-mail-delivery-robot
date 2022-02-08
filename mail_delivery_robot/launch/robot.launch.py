@@ -43,10 +43,17 @@ def generate_launch_description():
             executable='robot_driver',
             name='robot_driver',
             remappings=[
-             ('/control/navigationMap', '/navigation/navigationMap')]
+             ('/control/navigationMap', '/navigation/navigationMap'),
+             ('/control/bumpEvent', '/preceptions/bumpEvent')]
             ),
         Node(package='mail_delivery_robot',
             namespace='navigation',
             executable='captain',
-            name='captain')
+            name='captain'),
+        Node(package='mail_delivery_robot',
+            namespace='preceptions',
+            executable='bumper_sensor',
+            name='bumper_sensor',
+            remappings=[('/preceptions/bumper', '/bumper')]),
+            
     ])

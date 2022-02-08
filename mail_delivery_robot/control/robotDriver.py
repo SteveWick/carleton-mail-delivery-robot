@@ -13,14 +13,14 @@ class DriverStateMachine:
         self.currentState = initialState
     def run(self, distance,angle,captainRequest):
         return self.currentState.run(distance,angle)
-    def next(self,distance,angle,captainRequest):
-        self.currentState = self.currentState.next(distance,angle,captainRequest)
+    def next(self,distance,angle,captainRequest,bumperState):
+        self.currentState = self.currentState.next(distance,angle,captainRequest,bumperState)
 
 class DriverState:
     counter = 0
     def run(self):
         assert 0, "Must be implemented"
-    def next(self, distance,angle, captainRequest):
+    def next(self, distance,angle, captainRequest,bumperState):
         assert 0, "Must be implemented"
     def toString(self):
         return ""
@@ -30,7 +30,7 @@ class Dock(DriverState):
         action = String()
         action.data = "0"
         return action 
-    def next(self,distance,angle,captainRequest):
+    def next(self,distance,angle,captainRequest,bumperState):
         #ignore distances
         if captainRequest == "undock":
             return DriverStateMachine.findWall
@@ -44,7 +44,7 @@ class FindWall(DriverState):
         action = String()
         action.data = "forward"
         return action
-    def next(self,distance,angle,captainRequest):
+    def next(self,distance,angle,captainRequest,bumperState):
         if(float(distance) > 20.0):
             self.counter = 0
             return DriverStateMachine.findWallSpin
@@ -68,7 +68,7 @@ class FindWallSpin(DriverState):
             self.counter += 1
             action.data = "0"
         return action
-    def next(self,distance,angle,captainRequest):
+    def next(self,distance,angle,captainRequest,bumperState):
         if(float(distance) < 15.0 and float(angle) > 60.0 and float(angle) < 120.0):
             return DriverStateMachine.findWall
         else:
@@ -89,7 +89,7 @@ class WallFollow(DriverState):
             action.data = "forward"
             self.counter = 0
         return action 
-    def next(self,distance,angle,captainRequest):
+    def next(self,distance,angle,captainRequest, bumperState):
         if(captainRequest == "rturn"):
             return DriverStateMachine.rightTurnApproach
         return DriverStateMachine.wallFollow
@@ -109,7 +109,7 @@ class RightTurnApproach(DriverState):
             action.data = "forward"
             self.counter = 0
         return action 
-    def next(self,distance,angle,captainRequest):
+    def next(self,distance,angle,captainRequest, bumperState):
         if((float(distance) > 20.0)):
             return DriverStateMachine.rightTurn
         return DriverStateMachine.wallFollow
@@ -151,12 +151,14 @@ class RobotDriver(Node):
         self.distance = 0.0
         self.angle = 0.0
         self.captainRequest = 0
+        self.bumperState = "unpressed"
         self.actionPublisher = self.create_publisher(String,'actions',2)
         self.IRSubscriber = self.create_subscription(String,'preceptions', self.updateDistance,10)
         self.mapSubscriber = self.create_subscription(String,'navigationMap', self.updateMapState,10)
+        self.bumperEventSubscriber = self.create_subscription(String,'bumpEvent',self.updateBumperState,10)
         timer_period = 0.2 #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.findWall)
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.dock)
 
 
     def determineAction(self):
@@ -175,7 +177,7 @@ class RobotDriver(Node):
         
     def updateMapState(self, data):
         self.captainRequest = data.data
-        self.driverStateMachine.next(self.distance,self.angle,self.captainRequest)
+        self.driverStateMachine.next(self.distance,self.angle,self.captainRequest,self.bumperState)
         self.get_logger().info("Captain: " + self.captainRequest)
 
 
@@ -187,8 +189,15 @@ class RobotDriver(Node):
         if(data.data != "-1"):
             self.distance = data.data.split(",")[0]
             self.angle = data.data.split(",")[1]
-            self.driverStateMachine.next(self.distance,self.angle,self.captainRequest)
+            self.driverStateMachine.next(self.distance,self.angle,self.captainRequest,self.bumperState)
         # self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
+    
+    def updateBumperState(self,data):
+        self.bumperState = data.data
+        self.driverStateMachine.next(self.distance,self.angle,self.captainRequest,self.bumperState)
+        self.get_logger().info("Bumper State: " + self.bumperState)
+
+
 
 
 def main():
