@@ -90,6 +90,10 @@ class WallFollow(DriverState):
             self.counter = 0
         return action 
     def next(self,distance,angle,captainRequest, bumperState):
+        if(bumperState == "Cpressed"):
+            return DriverStateMachine.headOnCollisionAvoid
+        if(bumperState == "Rpressed"):
+            return DriverStateMachine.graze
         if(captainRequest == "rturn"):
             return DriverStateMachine.rightTurnApproach
         return DriverStateMachine.wallFollow
@@ -126,7 +130,7 @@ class RightTurn(DriverState):
             action.data = "forward"
         self.counter += 1
         return action 
-    def next(self,distance,angle,captainRequest):
+    def next(self,distance,angle,captainRequest,bumperState):
         if(self.counter > 5):
             return DriverStateMachine.wallFollow
         else:
@@ -136,6 +140,77 @@ class RightTurn(DriverState):
     def toString(self):
         return "RightTurn"
 
+class HeadOnCollisionAvoid(DriverState):
+    def run(self,distance,angle):
+        action = String()
+        if(self.counter <2):
+            action.data = "backward"
+        elif(self.counter < 5):
+            action.data = "left"
+        else:
+            action.data = "creepForward"
+        self.counter += 1
+        return action 
+    def next(self,distance,angle,captainRequest,bumperState):
+        
+        if(self.counter > 6 and (float(distance) > 20.0)):
+            self.counter = 0
+            return DriverStateMachine.headOnCollisionReturn
+        elif(bumperState == "Rpressed"):
+            return DriverStateMachine.graze
+        elif(self.counter > 40):
+            self.counter = 0
+            return DriverStateMachine.wallFollow
+        else:
+            return DriverStateMachine.headOnCollisionAvoid
+        
+    def toString(self):
+        return "HeadOnCollisionAvoid"
+
+class HeadOnCollisionReturn(DriverState):
+    def run(self,distance,angle):
+        action = String()
+        if(self.counter < 2):
+            action.data = "right"
+        elif(self.counter < 4):
+            action.data = "forward"
+        elif(self.counter % 3 == 0):
+            action.data = "sright"
+        else:
+            action.data = "forward"
+        self.counter += 1
+        return action 
+    def next(self,distance,angle,captainRequest,bumperState):
+        if(bumperState == "Rpressed"):
+            return DriverStateMachine.graze
+        if(self.counter > 30):
+            self.counter = 0
+            return DriverStateMachine.wallFollow
+        else:
+            return DriverStateMachine.headOnCollisionReturn
+        
+    def toString(self):
+        return "HeadOnCollisionReturn"
+
+class Graze(DriverState):
+    def run(self,distance,angle):
+        action = String()
+        if(self.counter == 0):
+            action.data = "backwards"
+        if(self.counter < 3):
+            action.data = "sleft"
+        self.counter += 1
+        return action 
+    def next(self,distance,angle,captainRequest,bumperState):
+        if(self.counter > 3):
+            self.counter = 0
+            return DriverStateMachine.wallFollow
+        else:
+            return DriverStateMachine.graze
+        
+    def toString(self):
+        return "Graze"
+
 #Initialize states
 DriverStateMachine.dock = Dock()
 DriverStateMachine.wallFollow = WallFollow()
@@ -143,6 +218,9 @@ DriverStateMachine.findWall = FindWall()
 DriverStateMachine.findWallSpin = FindWallSpin()
 DriverStateMachine.rightTurnApproach = RightTurnApproach()
 DriverStateMachine.rightTurn = RightTurn()
+DriverStateMachine.headOnCollisionAvoid = HeadOnCollisionAvoid()
+DriverStateMachine.headOnCollisionReturn = HeadOnCollisionReturn()
+DriverStateMachine.graze = Graze()
 
 DEBUG = False
 class RobotDriver(Node):
@@ -158,12 +236,12 @@ class RobotDriver(Node):
         self.bumperEventSubscriber = self.create_subscription(String,'bumpEvent',self.updateBumperState,10)
         timer_period = 0.2 #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.dock)
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.wallFollow)
 
 
     def determineAction(self):
         action = self.driverStateMachine.run(self.distance,self.angle,self.captainRequest)
-        self.get_logger().debug("DriverState: " + self.driverStateMachine.currentState.toString())
+        self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
         self.get_logger().debug("Distance: " + str(self.distance))
 
         if(action.data != 0):
@@ -195,7 +273,7 @@ class RobotDriver(Node):
     def updateBumperState(self,data):
         self.bumperState = data.data
         self.driverStateMachine.next(self.distance,self.angle,self.captainRequest,self.bumperState)
-        self.get_logger().info("Bumper State: " + self.bumperState)
+        self.get_logger().debug("Bumper State: " + self.bumperState)
 
 
 

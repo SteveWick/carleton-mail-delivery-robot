@@ -12,6 +12,8 @@ DEBUG = False
 class BumperSensor(Node):
     def __init__(self):
         super().__init__('bumper_sensor')
+        self.counter = 0
+        self.lastState = ""
         self.bumperSubscriber = self.create_subscription(Bumper,'bumper', self.readBump,10)
         self.publisher_ = self.create_publisher(String, 'bumpEvent' , 10)
  
@@ -42,8 +44,12 @@ class BumperSensor(Node):
         #     message.data = "bumper detects an object to the right"
 
         # Publish the perception
-        self.get_logger().debug(bumpEvent.data)
-        self.publisher_.publish(bumpEvent)
+        if(self.lastState != bumpEvent.data or self.counter > 30):
+            self.lastState = bumpEvent.data
+            self.get_logger().debug(bumpEvent.data)
+            self.publisher_.publish(bumpEvent)
+            self.counter = 0
+        self.counter += 1
 
 
 def main():
