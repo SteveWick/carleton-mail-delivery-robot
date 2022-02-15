@@ -5,7 +5,6 @@ type Bid {
 }
 
 type Request {
-    id: Int! @id
     robot: Int
     timestamp: String!
     source: String!
@@ -14,7 +13,7 @@ type Request {
     recipient: String!
     state: String!
     age: String
-    bidExpirary: String
+    bidExpiry: String
     priority: Int
     bids: [Bid]
 }
@@ -25,21 +24,31 @@ type User {
 }
 
 type Robot {
-    id: Int! @id
     location: String
     status: String
 }
 
+type Path {
+    beacon: Beacon
+    destBeacon: Int
+    distance: Int
+}
+
+type Junction {
+    beacons: [Int]
+}
+
 type Beacon {
-    id: Int! @id
-    location: String
+    junction: Int
     status: String
+    paths: [Path] @relation
 }
 
 type Query {
     allRequests: [Request!]
     allUsers: [User!]
     allRobots: [Robot!]
+    allJunctions: [Junction!]
     allBeacons: [Beacon!]
     requestsByState(state: String!): [Request!]
 }
