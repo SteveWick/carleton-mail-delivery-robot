@@ -34,13 +34,13 @@ class JunctionSlopeTracker():
         self.sum += int(dataPoint)
         self.averageQueue.append(self.sum / len(self.dataQueue))
         self.counter += 1
-        logger.info("Average: %s" %  self.averageQueue[-1])
+        logger.debug("Average: %s" %  self.averageQueue[-1])
         #slope assume equal distance between points i.e divded by 1
         #Let 5 points accumulate, then take simple slope.
         if len(self.averageQueue) >= 3 and self.counter == 3:
             self.slopeQueue.append(self.averageQueue[-1] - self.averageQueue[-3])
             self.counter = 0
-            logger.info("Slope: %s" %  self.slopeQueue[-1])
+            logger.debug("Slope: %s" %  self.slopeQueue[-1])
         
 
         #Slope change is confirmed if newest slope is not equal to last two slopes.
@@ -70,7 +70,7 @@ class Captain(Node):
         self.mapPublisher.publish(mapUpdate)
 
     def readBeacon(self, beacon):
-        self.get_logger().info('Received: "%s"' % beacon.data)
+        self.get_logger().debug('Received: "%s"' % beacon.data)
         
         if beacon.data.split(",")[0] in self.junctions:
             if self.junctions[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger()):

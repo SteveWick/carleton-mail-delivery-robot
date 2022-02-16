@@ -78,6 +78,12 @@ def getTwistMesg(action):
     if action == "forward":
         message.linear.x = 0.2
         message.angular.z = 0.0
+    elif action == "slowForward":
+        message.linear.x = 0.1
+        message.angular.z = 0.0
+    elif action == "creepForward":
+        message.linear.x = 0.05
+        message.linear.z = 0.0
     elif action == "backward":
         message.linear.x = -0.2
         message.linear.z = 0.0
