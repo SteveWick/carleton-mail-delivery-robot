@@ -6,9 +6,20 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+import csv
 
-# Default magic numbers
-NOT_SURE_WHAT_THIS_IS_NUMBER_1 = 7
+# ~~~~ DEFAULTS ~~~~~
+magicNumbers = {
+    'BEACON_OUTLIER_THRESHOLD': 7,
+}
+
+# ~~~~ Load overrides ~~~~
+def loadNumberOverrides():
+    with open('/var/local/magicNumbers.csv') as csvfile:
+        reader = csv.reader(csvfile,delimiter=",")
+        for row in reader:
+            magicNumbers[row[0]]= row[1]
+    return magicNumbers
 
 def sign(x):
     return bool(x > 0) - bool(x < 0)
@@ -25,7 +36,7 @@ class JunctionSlopeTracker():
         self.signalSent = False
     
     def addDataPoint(self,dataPoint,logger):
-        if(len(self.averageQueue) != 0 and abs(int(dataPoint) - int(self.averageQueue[-1])) > NOT_SURE_WHAT_THIS_IS_NUMBER_1):
+        if(len(self.averageQueue) != 0 and abs(int(dataPoint) - int(self.averageQueue[-1])) > magicNumbers['BEACON_OUTLIER_THRESHOLD']):
             return False
         
         #Remove data point exceeding window size N
@@ -91,6 +102,7 @@ class Captain(Node):
 
 DEBUG = False
 def main():
+    loadNumberOverrides()
     rclpy.init()
     captain = Captain()
     # rclpy.spin(captain)

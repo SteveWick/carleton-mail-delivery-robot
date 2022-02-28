@@ -46,15 +46,13 @@ magicNumbers = {
     'TIMER_PERIOD': 0.2,
 
     # captain.py
-    'NOT_SURE_WHAT_THIS_IS_NUMBER_1': 7,
+    'BEACON_OUTLIER_THRESHOLD': 7,
 
     # bumperSensor.py
     'MAX_BUMP_EVENT_PUBLISH_TICKS': 30
 }
 
-
 # ~~~~ Load overrides ~~~~
-
 def loadNumberOverrides():
     with open('/var/local/magicNumbers.csv') as csvfile:
     # with open('magicNumbers.csv') as csvfile:

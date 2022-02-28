@@ -7,31 +7,40 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 import time
+import csv
 
-# Default magic numbers
-MAX_TARGET_WALL_DISTANCE = 20.0
-MIN_TARGET_WALL_DISTANCE = 10.0
-MAX_TARGET_WALL_ANGLE = 120.0
-MIN_TARGET_WALL_ANGLE = 60.0
-FIND_WALL_SPIN_TARGET_WALL_DISTANCE = 15.0
-NO_WALL_RIGHT_TURN_DISTANCE = 20.0
-COLLISION_OBJECT_PASSED_DISTANCE = 20.0
+# ~~~~ DEFAULTS ~~~~~
+magicNumbers = {
+    'MAX_TARGET_WALL_DISTANCE': 20.0,
+    'MIN_TARGET_WALL_DISTANCE': 10.0,
+    'MAX_TARGET_WALL_ANGLE': 120.0,
+    'MIN_TARGET_WALL_ANGLE': 60.0,
+    'FIND_WALL_SPIN_TARGET_WALL_DISTANCE': 15.0,
+    'NO_WALL_RIGHT_TURN_DISTANCE': 20.0,
+    'COLLISION_OBJECT_PASSED_DISTANCE': 20.0,
+    'FIND_WALL_TICKS': 15,
+    'FIND_WALL_SPIN_TICKS': 5,
+    'RIGHT_TURN_TICKS': 3,
+    'RIGHT_TURN_FORWARD_TICKS': 5,
+    'COLLISION_BACK_TICKS': 2,
+    'COLLISION_LEFT_TICKS': 5,
+    'COLLISION_RETURN_MIN_TICKS': 6,
+    'COLLISION_WALL_FOLLOW_TICKS': 40,
+    'COLLISION_RETURN_RIGHT_TICKS': 2,
+    'COLLISION_RETURN_FORWARD_TICKS': 4,
+    'COLLISION_RETURN_WALL_FOLLOW_TICKS': 30,
+    'GRAZE_SLEFT_TICKS': 3,
+    'GRAZE_WALL_FOLLOW_TICKS': 3,
+    'TIMER_PERIOD': 0.2,
+}
 
-FIND_WALL_TICKS = 15
-FIND_WALL_SPIN_TICKS = 5
-RIGHT_TURN_TICKS = 3
-RIGHT_TURN_FORWARD_TICKS = 5
-COLLISION_BACK_TICKS = 2
-COLLISION_LEFT_TICKS = 5
-COLLISION_RETURN_MIN_TICKS = 6
-COLLISION_WALL_FOLLOW_TICKS = 40
-COLLISION_RETURN_RIGHT_TICKS = 2
-COLLISION_RETURN_FORWARD_TICKS = 4
-COLLISION_RETURN_WALL_FOLLOW_TICKS = 30
-GRAZE_SLEFT_TICKS = 3
-GRAZE_WALL_FOLLOW_TICKS = 3
-
-TIMER_PERIOD = 0.2
+# ~~~~ Load overrides ~~~~
+def loadNumberOverrides():
+    with open('/var/local/magicNumbers.csv') as csvfile:
+        reader = csv.reader(csvfile,delimiter=",")
+        for row in reader:
+            magicNumbers[row[0]]= row[1]
+    return magicNumbers
 
 class DriverStateMachine:
     def __init__(self, initialState):
@@ -70,10 +79,10 @@ class FindWall(DriverState):
         action.data = "forward"
         return action
     def next(self,distance,angle,captainRequest,bumperState):
-        if(float(distance) > MAX_TARGET_WALL_DISTANCE):
+        if(float(distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE']):
             self.counter = 0
             return DriverStateMachine.findWallSpin
-        elif(self.counter > FIND_WALL_TICKS):
+        elif(self.counter > magicNumbers['FIND_WALL_TICKS']):
             self.counter = 0
             return DriverStateMachine.wallFollow
         else:
@@ -85,7 +94,7 @@ class FindWall(DriverState):
 class FindWallSpin(DriverState):
     def run(self,distance,angle):
         action = String()
-        if self.counter > FIND_WALL_SPIN_TICKS:
+        if self.counter > magicNumbers['FIND_WALL_SPIN_TICKS']:
             self.counter = 0
             #left
             action.data = "left"
@@ -94,7 +103,7 @@ class FindWallSpin(DriverState):
             action.data = "0"
         return action
     def next(self,distance,angle,captainRequest,bumperState):
-        if(float(distance) < FIND_WALL_SPIN_TARGET_WALL_DISTANCE and float(angle) > MIN_TARGET_WALL_ANGLE and float(angle) < MAX_TARGET_WALL_ANGLE):
+        if(float(distance) < magicNumbers['FIND_WALL_SPIN_TARGET_WALL_DISTANCE'] and float(angle) > magicNumbers['MIN_TARGET_WALL_ANGLE'] and float(angle) < magicNumbers['MAX_TARGET_WALL_ANGLE']):
             return DriverStateMachine.findWall
         else:
             return DriverStateMachine.findWallSpin
@@ -104,10 +113,10 @@ class FindWallSpin(DriverState):
 class WallFollow(DriverState):
     def run(self,distance,angle):
         action = String()
-        if((float(distance) > MAX_TARGET_WALL_DISTANCE or float(angle) > MAX_TARGET_WALL_ANGLE) and self.counter % 5 == 0):
+        if((float(distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE'] or float(angle) > magicNumbers['MAX_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sright"
-        elif((float(distance) < MIN_TARGET_WALL_DISTANCE or float(angle) < MIN_TARGET_WALL_ANGLE) and self.counter % 5 == 0):
+        elif((float(distance) < magicNumbers['MIN_TARGET_WALL_DISTANCE'] or float(angle) < magicNumbers['MIN_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sleft"
         else:    
@@ -128,10 +137,10 @@ class WallFollow(DriverState):
 class RightTurnApproach(DriverState):
     def run(self,distance,angle):
         action = String()
-        if((float(distance) > MAX_TARGET_WALL_DISTANCE or float(angle) > MAX_TARGET_WALL_ANGLE) and self.counter % 5 == 0):
+        if((float(distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE'] or float(angle) > magicNumbers['MAX_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sright"
-        elif((float(distance) < MIN_TARGET_WALL_DISTANCE or float(angle) < MIN_TARGET_WALL_ANGLE) and self.counter % 5 == 0):
+        elif((float(distance) < magicNumbers['MIN_TARGET_WALL_DISTANCE'] or float(angle) < magicNumbers['MIN_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sleft"
         else:    
@@ -139,7 +148,7 @@ class RightTurnApproach(DriverState):
             self.counter = 0
         return action 
     def next(self,distance,angle,captainRequest, bumperState):
-        if((float(distance) > NO_WALL_RIGHT_TURN_DISTANCE)):
+        if((float(distance) > magicNumbers['NO_WALL_RIGHT_TURN_DISTANCE'])):
             return DriverStateMachine.rightTurn
         return DriverStateMachine.wallFollow
     def toString(self):
@@ -149,14 +158,14 @@ class RightTurn(DriverState):
     def run(self,distance,angle):
         action = String()
         
-        if(self.counter < RIGHT_TURN_TICKS):
+        if(self.counter < magicNumbers['RIGHT_TURN_TICKS']):
             action.data = "right"
-        elif(self.counter < RIGHT_TURN_FORWARD_TICKS):
+        elif(self.counter < magicNumbers['RIGHT_TURN_FORWARD_TICKS']):
             action.data = "forward"
         self.counter += 1
         return action 
     def next(self,distance,angle,captainRequest,bumperState):
-        if(self.counter > RIGHT_TURN_FORWARD_TICKS):
+        if(self.counter > magicNumbers['RIGHT_TURN_FORWARD_TICKS']):
             return DriverStateMachine.wallFollow
         else:
             captainRequest = ""
@@ -168,9 +177,9 @@ class RightTurn(DriverState):
 class HeadOnCollisionAvoid(DriverState):
     def run(self,distance,angle):
         action = String()
-        if(self.counter < COLLISION_BACK_TICKS):
+        if(self.counter < magicNumbers['COLLISION_BACK_TICKS']):
             action.data = "backward"
-        elif(self.counter < COLLISION_LEFT_TICKS):
+        elif(self.counter < magicNumbers['COLLISION_LEFT_TICKS']):
             action.data = "left"
         else:
             action.data = "creepForward"
@@ -178,12 +187,12 @@ class HeadOnCollisionAvoid(DriverState):
         return action 
     def next(self,distance,angle,captainRequest,bumperState):
         
-        if(self.counter > COLLISION_RETURN_MIN_TICKS and (float(distance) > COLLISION_OBJECT_PASSED_DISTANCE)):
+        if(self.counter > magicNumbers['COLLISION_RETURN_MIN_TICKS'] and (float(distance) > magicNumbers['COLLISION_OBJECT_PASSED_DISTANCE'])):
             self.counter = 0
             return DriverStateMachine.headOnCollisionReturn
         elif(bumperState == "Rpressed"):
             return DriverStateMachine.graze
-        elif(self.counter > COLLISION_WALL_FOLLOW_TICKS):
+        elif(self.counter > magicNumbers['COLLISION_WALL_FOLLOW_TICKS']):
             self.counter = 0
             return DriverStateMachine.wallFollow
         else:
@@ -195,9 +204,9 @@ class HeadOnCollisionAvoid(DriverState):
 class HeadOnCollisionReturn(DriverState):
     def run(self,distance,angle):
         action = String()
-        if(self.counter < COLLISION_RETURN_RIGHT_TICKS):
+        if(self.counter < magicNumbers['COLLISION_RETURN_RIGHT_TICKS']):
             action.data = "right"
-        elif(self.counter < COLLISION_RETURN_FORWARD_TICKS):
+        elif(self.counter < magicNumbers['COLLISION_RETURN_FORWARD_TICKS']):
             action.data = "forward"
         elif(self.counter % 3 == 0):
             action.data = "sright"
@@ -208,7 +217,7 @@ class HeadOnCollisionReturn(DriverState):
     def next(self,distance,angle,captainRequest,bumperState):
         if(bumperState == "Rpressed"):
             return DriverStateMachine.graze
-        if(self.counter > COLLISION_RETURN_WALL_FOLLOW_TICKS):
+        if(self.counter > magicNumbers['COLLISION_RETURN_WALL_FOLLOW_TICKS']):
             self.counter = 0
             return DriverStateMachine.wallFollow
         else:
@@ -222,12 +231,12 @@ class Graze(DriverState):
         action = String()
         if(self.counter == 0):
             action.data = "backwards"
-        if(self.counter < GRAZE_SLEFT_TICKS):
+        if(self.counter < magicNumbers['GRAZE_SLEFT_TICKS']):
             action.data = "sleft"
         self.counter += 1
         return action 
     def next(self,distance,angle,captainRequest,bumperState):
-        if(self.counter > GRAZE_WALL_FOLLOW_TICKS):
+        if(self.counter > magicNumbers['GRAZE_WALL_FOLLOW_TICKS']):
             self.counter = 0
             return DriverStateMachine.wallFollow
         else:
@@ -259,7 +268,7 @@ class RobotDriver(Node):
         self.IRSubscriber = self.create_subscription(String,'preceptions', self.updateDistance,10)
         self.mapSubscriber = self.create_subscription(String,'navigationMap', self.updateMapState,10)
         self.bumperEventSubscriber = self.create_subscription(String,'bumpEvent',self.updateBumperState,10)
-        timer_period = TIMER_PERIOD #Seconds
+        timer_period = magicNumbers['TIMER_PERIOD'] #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
         self.driverStateMachine = DriverStateMachine(DriverStateMachine.wallFollow)
 
@@ -304,6 +313,7 @@ class RobotDriver(Node):
 
 
 def main():
+    loadNumberOverrides()
     rclpy.init()
     robot_driver = RobotDriver()
     rclpy.spin(robot_driver)
