@@ -13,8 +13,37 @@ from std_msgs.msg import String
 from std_msgs.msg import Empty
 from geometry_msgs.msg import Twist
 import time
+import csv
 
 # This script is meant to take all the action decisions from our reasoner and publish them to the roomba (via cmd_vel)
+
+
+# ~~~~ DEFAULTS ~~~~~
+magicNumbers = {
+    'ZERO_SPEED': 0.0,
+    'FORWARD_X_SPEED': 0.2,
+    'SLOW_FORWARD_X_SPEED': 0.1,
+    'CREEP_FORWARD_X_SPEED': 0.05,
+    'BACKWARD_X_SPEED': -0.2,
+    'LEFT_Z_SPEED': 3.5,
+    'RIGHT_Z_SPEED': -3.5,
+    'SLEFT_X_SPEED': 0.05,
+    'SLEFT_Z_SPEED': 0.5,
+    'SRIGHT_X_SPEED': 0.05,
+    'SRIGHT_Z_SPEED': -0.5,
+    'AVOIDRIGHT_X_SPEED': 0.08,
+    'AVOIDRIGHT_Z_SPEED': -0.5,
+    'BLEFT_X_SPEED': -0.1,
+    'BLEFT_Z_SPEED': 0.5,
+}
+
+# ~~~~ Load overrides ~~~~
+def loadNumberOverrides():
+    with open('/var/local/magicNumbers.csv') as csvfile:
+        reader = csv.reader(csvfile,delimiter=",")
+        for row in reader:
+            magicNumbers[row[0]]= row[1]
+    return magicNumbers
 
 class ActionTranslator(Node):
     def __init__(self):
@@ -76,43 +105,44 @@ def getTwistMesg(action):
     message = Twist()
     
     if action == "forward":
-        message.linear.x = 0.2
-        message.angular.z = 0.0
+        message.linear.x = magicNumbers['FORWARD_X_SPEED']
+        message.angular.z = magicNumbers['ZERO_SPEED']
     elif action == "slowForward":
-        message.linear.x = 0.1
-        message.angular.z = 0.0
+        message.linear.x = magicNumbers['SLOW_FORWARD_X_SPEED']
+        message.angular.z = magicNumbers['ZERO_SPEED']
     elif action == "creepForward":
-        message.linear.x = 0.05
-        message.linear.z = 0.0
+        message.linear.x = magicNumbers['CREEP_FORWARD_X_SPEED']
+        message.angular.z = magicNumbers['ZERO_SPEED']
     elif action == "backward":
-        message.linear.x = -0.2
-        message.linear.z = 0.0
+        message.linear.x = magicNumbers['BACKWARD_X_SPEED']
+        message.linear.z = magicNumbers['ZERO_SPEED']
     elif action == "left":
-        message.linear.x = 0.0
-        message.angular.z = 3.5
+        message.linear.x = magicNumbers['ZERO_SPEED']
+        message.angular.z = magicNumbers['LEFT_Z_SPEED']
     elif action == "right":
-        message.linear.x = 0.0
-        message.angular.z = -3.5
+        message.linear.x = magicNumbers['ZERO_SPEED']
+        message.angular.z = magicNumbers['RIGHT_Z_SPEED']
     elif action == "sleft":
-        message.linear.x = 0.05
-        message.angular.z = 0.5
+        message.linear.x = magicNumbers['SLEFT_X_SPEED']
+        message.angular.z = magicNumbers['SLEFT_Z_SPEED']
     elif action == "sright":
-        message.linear.x = 0.05
-        message.angular.z = -0.5
+        message.linear.x = magicNumbers['SRIGHT_X_SPEED']
+        message.angular.z = magicNumbers['SRIGHT_Z_SPEED']
     elif action == "avoidright":
-        message.linear.x = 0.08
-        message.angular.z = -0.5
+        message.linear.x = magicNumbers['AVOIDRIGHT_X_SPEED']
+        message.angular.z = magicNumbers['AVOIDRIGHT_Z_SPEED']
     elif action == "bleft":
-        message.linear.x = -0.1
-        message.angular.z = 0.5
+        message.linear.x = magicNumbers['BLEFT_X_SPEED']
+        message.angular.z = magicNumbers['BLEFT_Z_SPEED']
     elif action == "stop":
-        message.linear.x = 0.0
-        message.angular.z = 0.0
+        message.linear.x = magicNumbers['ZERO_SPEED']
+        message.angular.z = magicNumbers['ZERO_SPEED']
     
     return message
 
 # Main execution
 def main():
+    loadNumberOverrides()
     rclpy.init()
     action_translator = ActionTranslator()
     rclpy.spin(action_translator)
