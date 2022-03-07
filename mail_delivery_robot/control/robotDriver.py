@@ -15,9 +15,6 @@ magicNumbers = {
     'MIN_TARGET_WALL_DISTANCE': 10.0,
     'MAX_TARGET_WALL_ANGLE': 120.0,
     'MIN_TARGET_WALL_ANGLE': 60.0,
-    'FIND_WALL_SPIN_TARGET_WALL_DISTANCE': 15.0,
-    'NO_WALL_RIGHT_TURN_DISTANCE': 20.0,
-    'COLLISION_OBJECT_PASSED_DISTANCE': 20.0,
     'FIND_WALL_TICKS': 15,
     'FIND_WALL_SPIN_TICKS': 5,
     'RIGHT_TURN_TICKS': 3,
@@ -45,26 +42,26 @@ def loadNumberOverrides():
 class DriverStateMachine:
     def __init__(self, initialState):
         self.currentState = initialState
-    def run(self, distance,angle,captainRequest):
-        return self.currentState.run(distance,angle)
-    def next(self,distance,angle,captainRequest,bumperState):
-        self.currentState = self.currentState.next(distance,angle,captainRequest,bumperState)
+    def run(self, distanceFlags,captainRequest):
+        return self.currentState.run(distanceFlags)
+    def next(self,distanceFlags,captainRequest,bumperState):
+        self.currentState = self.currentState.next(distanceFlags,captainRequest,bumperState)
 
 class DriverState:
     counter = 0
     def run(self):
         assert 0, "Must be implemented"
-    def next(self, distance,angle, captainRequest,bumperState):
+    def next(self, distanceFlags, captainRequest,bumperState):
         assert 0, "Must be implemented"
     def toString(self):
         return ""
 
 class Dock(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         action.data = "0"
         return action 
-    def next(self,distance,angle,captainRequest,bumperState):
+    def next(self,distanceFlags,captainRequest,bumperState):
         #ignore distances
         if captainRequest == "undock":
             return DriverStateMachine.findWall
@@ -74,12 +71,12 @@ class Dock(DriverState):
         return "Dock"
 
 class FindWall(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         action.data = "forward"
         return action
-    def next(self,distance,angle,captainRequest,bumperState):
-        if(float(distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE']):
+    def next(self,distanceFlags,captainRequest,bumperState):
+        if(distanceFlags["tooFar"]):
             self.counter = 0
             return DriverStateMachine.findWallSpin
         elif(self.counter > magicNumbers['FIND_WALL_TICKS']):
@@ -92,7 +89,7 @@ class FindWall(DriverState):
         return "FindWall"
 
 class FindWallSpin(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         if self.counter > magicNumbers['FIND_WALL_SPIN_TICKS']:
             self.counter = 0
@@ -102,8 +99,8 @@ class FindWallSpin(DriverState):
             self.counter += 1
             action.data = "0"
         return action
-    def next(self,distance,angle,captainRequest,bumperState):
-        if(float(distance) < magicNumbers['FIND_WALL_SPIN_TARGET_WALL_DISTANCE'] and float(angle) > magicNumbers['MIN_TARGET_WALL_ANGLE'] and float(angle) < magicNumbers['MAX_TARGET_WALL_ANGLE']):
+    def next(self,distanceFlags,captainRequest,bumperState):
+        if(not distanceFlags["tooFar"] and not distanceFlags["tooTight"] and not distanceFlags["tooWide"]):
             return DriverStateMachine.findWall
         else:
             return DriverStateMachine.findWallSpin
@@ -111,19 +108,19 @@ class FindWallSpin(DriverState):
         return "FindWallSpin"
 
 class WallFollow(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
-        if((float(distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE'] or float(angle) > magicNumbers['MAX_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
+        if((distanceFlags["tooFar"] or distanceFlags["wideAngle"]) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sright"
-        elif((float(distance) < magicNumbers['MIN_TARGET_WALL_DISTANCE'] or float(angle) < magicNumbers['MIN_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
+        elif((distanceFlags["tooClose"] or distanceFlags["tightAngle"]) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sleft"
         else:    
             action.data = "forward"
             self.counter = 0
         return action 
-    def next(self,distance,angle,captainRequest, bumperState):
+    def next(self,distanceFlags,captainRequest, bumperState):
         if(bumperState == "Cpressed"):
             return DriverStateMachine.headOnCollisionAvoid
         if(bumperState == "Rpressed"):
@@ -135,27 +132,27 @@ class WallFollow(DriverState):
         return "WallFollow"
     
 class RightTurnApproach(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
-        if((float(distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE'] or float(angle) > magicNumbers['MAX_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
+        if((distanceFlags["tooFar"] or distanceFlags["wideAngle"] ) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sright"
-        elif((float(distance) < magicNumbers['MIN_TARGET_WALL_DISTANCE'] or float(angle) < magicNumbers['MIN_TARGET_WALL_ANGLE']) and self.counter % 5 == 0):
+        elif((distanceFlags["tooClose"] or distanceFlags["tightAngle"]) and self.counter % 5 == 0):
             self.counter += 1
             action.data = "sleft"
         else:    
             action.data = "forward"
             self.counter = 0
         return action 
-    def next(self,distance,angle,captainRequest, bumperState):
-        if((float(distance) > magicNumbers['NO_WALL_RIGHT_TURN_DISTANCE'])):
+    def next(self,distanceFlags,captainRequest, bumperState):
+        if(distanceFlags["tooFar"]):
             return DriverStateMachine.rightTurn
         return DriverStateMachine.wallFollow
     def toString(self):
         return "RightTurnApproach"
 
 class RightTurn(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         
         if(self.counter < magicNumbers['RIGHT_TURN_TICKS']):
@@ -164,7 +161,7 @@ class RightTurn(DriverState):
             action.data = "forward"
         self.counter += 1
         return action 
-    def next(self,distance,angle,captainRequest,bumperState):
+    def next(self,distanceFlags,captainRequest,bumperState):
         if(self.counter > magicNumbers['RIGHT_TURN_FORWARD_TICKS']):
             return DriverStateMachine.wallFollow
         else:
@@ -175,7 +172,7 @@ class RightTurn(DriverState):
         return "RightTurn"
 
 class HeadOnCollisionAvoid(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         if(self.counter < magicNumbers['COLLISION_BACK_TICKS']):
             action.data = "backward"
@@ -185,9 +182,9 @@ class HeadOnCollisionAvoid(DriverState):
             action.data = "creepForward"
         self.counter += 1
         return action 
-    def next(self,distance,angle,captainRequest,bumperState):
+    def next(self,distanceFlags,captainRequest,bumperState):
         
-        if(self.counter > magicNumbers['COLLISION_RETURN_MIN_TICKS'] and (float(distance) > magicNumbers['COLLISION_OBJECT_PASSED_DISTANCE'])):
+        if(self.counter > magicNumbers['COLLISION_RETURN_MIN_TICKS'] and distanceFlags["tooFar"]):
             self.counter = 0
             return DriverStateMachine.headOnCollisionReturn
         elif(bumperState == "Rpressed"):
@@ -202,7 +199,7 @@ class HeadOnCollisionAvoid(DriverState):
         return "HeadOnCollisionAvoid"
 
 class HeadOnCollisionReturn(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         if(self.counter < magicNumbers['COLLISION_RETURN_RIGHT_TICKS']):
             action.data = "right"
@@ -214,7 +211,7 @@ class HeadOnCollisionReturn(DriverState):
             action.data = "forward"
         self.counter += 1
         return action 
-    def next(self,distance,angle,captainRequest,bumperState):
+    def next(self,distanceFlags,captainRequest,bumperState):
         if(bumperState == "Rpressed"):
             return DriverStateMachine.graze
         if(self.counter > magicNumbers['COLLISION_RETURN_WALL_FOLLOW_TICKS']):
@@ -227,7 +224,7 @@ class HeadOnCollisionReturn(DriverState):
         return "HeadOnCollisionReturn"
 
 class Graze(DriverState):
-    def run(self,distance,angle):
+    def run(self,distanceFlags):
         action = String()
         if(self.counter == 0):
             action.data = "backwards"
@@ -235,7 +232,7 @@ class Graze(DriverState):
             action.data = "sleft"
         self.counter += 1
         return action 
-    def next(self,distance,angle,captainRequest,bumperState):
+    def next(self,distanceFlags,captainRequest,bumperState):
         if(self.counter > magicNumbers['GRAZE_WALL_FOLLOW_TICKS']):
             self.counter = 0
             return DriverStateMachine.wallFollow
@@ -260,8 +257,17 @@ DEBUG = False
 class RobotDriver(Node):
     def __init__(self):
         super().__init__('robot_driver')
+        #Used for DEBUG only
         self.distance = 0.0
         self.angle = 0.0
+        
+        #Events
+        self.distanceFlags = {
+            "tooFar": False,
+            "tooClose": False,
+            "tightAngle": False,
+            "wideAngle": False   
+        }
         self.captainRequest = 0
         self.bumperState = "unpressed"
         self.actionPublisher = self.create_publisher(String,'actions',2)
@@ -274,9 +280,8 @@ class RobotDriver(Node):
 
 
     def determineAction(self):
-        action = self.driverStateMachine.run(self.distance,self.angle,self.captainRequest)
+        action = self.driverStateMachine.run(self.distanceFlags,self.captainRequest)
         self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
-        self.get_logger().debug("Distance: " + str(self.distance))
 
         if(action.data != 0):
             self.get_logger().debug("Publishing: " + action.data)
@@ -289,7 +294,7 @@ class RobotDriver(Node):
         
     def updateMapState(self, data):
         self.captainRequest = data.data
-        self.driverStateMachine.next(self.distance,self.angle,self.captainRequest,self.bumperState)
+        self.driverStateMachine.next(self.distanceFlags,self.captainRequest,self.bumperState)
         self.get_logger().info("Captain: " + self.captainRequest)
 
 
@@ -301,7 +306,12 @@ class RobotDriver(Node):
         if(data.data != "-1"):
             self.distance = data.data.split(",")[0]
             self.angle = data.data.split(",")[1]
-            self.driverStateMachine.next(self.distance,self.angle,self.captainRequest,self.bumperState)
+            self.distanceFlags["tooFar"] = float(self.distance) > magicNumbers['MAX_TARGET_WALL_DISTANCE']
+            self.distanceFlags["tooClose"] = float(self.distance) < magicNumbers['MIN_TARGET_WALL_DISTANCE']
+            self.distanceFlags["tightAngle"] = float(self.angle) > magicNumbers['MIN_TARGET_WALL_ANGLE']
+            self.distanceFlags["wideAngle"] = float(self.angle) < magicNumbers['MAX_TARGET_WALL_ANGLE']
+
+            self.driverStateMachine.next(self.distanceFlags,self.captainRequest,self.bumperState)
         # self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
     
     def updateBumperState(self,data):
@@ -313,7 +323,10 @@ class RobotDriver(Node):
 
 
 def main():
-    loadNumberOverrides()
+    try:
+        loadNumberOverrides()
+    except:
+        print("No tuning file found!")
     rclpy.init()
     robot_driver = RobotDriver()
     rclpy.spin(robot_driver)

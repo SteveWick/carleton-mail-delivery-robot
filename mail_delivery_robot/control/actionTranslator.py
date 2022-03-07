@@ -142,7 +142,10 @@ def getTwistMesg(action):
 
 # Main execution
 def main():
-    loadNumberOverrides()
+    try:
+        loadNumberOverrides()
+    except:
+        print("No tuning file found!")
     rclpy.init()
     action_translator = ActionTranslator()
     rclpy.spin(action_translator)

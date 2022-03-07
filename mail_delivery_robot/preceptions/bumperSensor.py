@@ -66,7 +66,10 @@ class BumperSensor(Node):
 
 
 def main():
-    loadNumberOverrides()
+    try:
+        loadNumberOverrides()
+    except:
+        print("No tuning file found!")
     rclpy.init()
     bumper_sensor = BumperSensor()
 

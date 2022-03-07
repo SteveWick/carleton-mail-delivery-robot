@@ -102,7 +102,10 @@ class Captain(Node):
 
 DEBUG = False
 def main():
-    loadNumberOverrides()
+    try:
+        loadNumberOverrides()
+    except:
+        print("No tuning file found!")
     rclpy.init()
     captain = Captain()
     # rclpy.spin(captain)
