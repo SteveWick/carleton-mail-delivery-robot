@@ -57,7 +57,7 @@ class BumperSensor(Node):
         #     message.data = "bumper detects an object to the right"
 
         # Publish the perception
-        if(self.lastState != bumpEvent.data or self.counter > magicNumbers['MAX_BUMP_EVENT_PUBLISH_TICKS']):
+        if(self.lastState != bumpEvent.data or self.counter > int(magicNumbers['MAX_BUMP_EVENT_PUBLISH_TICKS'])):
             self.lastState = bumpEvent.data
             self.get_logger().debug(bumpEvent.data)
             self.publisher_.publish(bumpEvent)

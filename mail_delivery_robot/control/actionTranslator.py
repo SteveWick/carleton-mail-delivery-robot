@@ -105,38 +105,38 @@ def getTwistMesg(action):
     message = Twist()
     
     if action == "forward":
-        message.linear.x = magicNumbers['FORWARD_X_SPEED']
-        message.angular.z = magicNumbers['ZERO_SPEED']
+        message.linear.x = float(magicNumbers['FORWARD_X_SPEED'])
+        message.angular.z = float(magicNumbers['ZERO_SPEED'])
     elif action == "slowForward":
-        message.linear.x = magicNumbers['SLOW_FORWARD_X_SPEED']
-        message.angular.z = magicNumbers['ZERO_SPEED']
+        message.linear.x = float(magicNumbers['SLOW_FORWARD_X_SPEED'])
+        message.angular.z = float(magicNumbers['ZERO_SPEED'])
     elif action == "creepForward":
-        message.linear.x = magicNumbers['CREEP_FORWARD_X_SPEED']
-        message.angular.z = magicNumbers['ZERO_SPEED']
+        message.linear.x = float(magicNumbers['CREEP_FORWARD_X_SPEED'])
+        message.angular.z = float(magicNumbers['ZERO_SPEED'])
     elif action == "backward":
-        message.linear.x = magicNumbers['BACKWARD_X_SPEED']
-        message.linear.z = magicNumbers['ZERO_SPEED']
+        message.linear.x = float(magicNumbers['BACKWARD_X_SPEED'])
+        message.linear.z = float(magicNumbers['ZERO_SPEED'])
     elif action == "left":
-        message.linear.x = magicNumbers['ZERO_SPEED']
-        message.angular.z = magicNumbers['LEFT_Z_SPEED']
+        message.linear.x = float(magicNumbers['ZERO_SPEED'])
+        message.angular.z = float(magicNumbers['LEFT_Z_SPEED'])
     elif action == "right":
-        message.linear.x = magicNumbers['ZERO_SPEED']
-        message.angular.z = magicNumbers['RIGHT_Z_SPEED']
+        message.linear.x = float(magicNumbers['ZERO_SPEED'])
+        message.angular.z = float(magicNumbers['RIGHT_Z_SPEED'])
     elif action == "sleft":
-        message.linear.x = magicNumbers['SLEFT_X_SPEED']
-        message.angular.z = magicNumbers['SLEFT_Z_SPEED']
+        message.linear.x = float(magicNumbers['SLEFT_X_SPEED'])
+        message.angular.z = float(magicNumbers['SLEFT_Z_SPEED'])
     elif action == "sright":
-        message.linear.x = magicNumbers['SRIGHT_X_SPEED']
-        message.angular.z = magicNumbers['SRIGHT_Z_SPEED']
+        message.linear.x = float(magicNumbers['SRIGHT_X_SPEED'])
+        message.angular.z = float(magicNumbers['SRIGHT_Z_SPEED'])
     elif action == "avoidright":
-        message.linear.x = magicNumbers['AVOIDRIGHT_X_SPEED']
-        message.angular.z = magicNumbers['AVOIDRIGHT_Z_SPEED']
+        message.linear.x = float(magicNumbers['AVOIDRIGHT_X_SPEED'])
+        message.angular.z = float(magicNumbers['AVOIDRIGHT_Z_SPEED'])
     elif action == "bleft":
-        message.linear.x = magicNumbers['BLEFT_X_SPEED']
-        message.angular.z = magicNumbers['BLEFT_Z_SPEED']
+        message.linear.x = float(magicNumbers['BLEFT_X_SPEED'])
+        message.angular.z = float(magicNumbers['BLEFT_Z_SPEED'])
     elif action == "stop":
-        message.linear.x = magicNumbers['ZERO_SPEED']
-        message.angular.z = magicNumbers['ZERO_SPEED']
+        message.linear.x = float(magicNumbers['ZERO_SPEED'])
+        message.angular.z = float(magicNumbers['ZERO_SPEED'])
     
     return message
 
