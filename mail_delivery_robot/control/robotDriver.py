@@ -148,7 +148,7 @@ class RightTurnApproach(DriverState):
         return action 
     def next(self,distanceFlags,captainRequest, bumperState):
         if(distanceFlags["tooFar"]):
-            return DriverStateMachine.rightTurn
+            return DriverStateMachine.rightTurnArrived
         return DriverStateMachine.rightTurnApproach
     def toString(self):
         return "RightTurnApproach"
@@ -194,7 +194,7 @@ class HeadOnCollisionInitial(DriverState):
             self.counter = 0
             return DriverStateMachine.wallFollow
         else:
-            return DriverStateMachine.HeadOnCollisionInitial
+            return DriverStateMachine.headOnCollisionInitial
         
     def toString(self):
         return "HeadOnCollisionInitial"
@@ -228,7 +228,7 @@ class Graze(DriverState):
     def run(self,distanceFlags):
         action = String()
         if(self.counter == 0):
-            action.data = "backwards"
+            action.data = "backward"
         if(self.counter < int(magicNumbers['GRAZE_SLEFT_TICKS'])):
             action.data = "sleft"
         self.counter += 1
@@ -306,7 +306,7 @@ class LeftTurnPassThrough(DriverState):
         return action 
     def next(self,distanceFlags, captainRequest, bumperState):
         if(distanceFlags["tooFar"]):
-            return DriverStateMachine.LeftTurnPassThrough
+            return DriverStateMachine.leftTurnPassThrough
         return DriverStateMachine.leftTurnRightWallFound
     def toString(self):
         return "LeftTurnPassThrough"
@@ -321,7 +321,7 @@ class LeftTurnRightWallFound(DriverState):
         self.counter += 1
         return action 
     def next(self,distanceFlags, captainRequest, bumperState):
-        if(bumperState == "Cpressed" or bumperState == "Rpressed"):
+        if(bumperState == "Cpressed" or bumperState == "Rpressed" or bumperState == "Lpressed" ):
             return DriverStateMachine.leftTurnLeftWallFound
         return DriverStateMachine.leftTurnRightWallFound
     def toString(self):
@@ -331,9 +331,9 @@ class LeftTurnLeftWallFound(DriverState):
     def run(self,distanceFlags):
         action = String()
         if(self.counter < int(magicNumbers['BACKOFF_TICKS'])):
-            action.data = "backwards"
+            action.data = "backward"
         elif(self.counter < int(magicNumbers['RIGHT_TURN_TICKS']) + int(magicNumbers['BACKOFF_TICKS'])):
-            action.data = "right"
+            action.data = "left"
         else:
             action.data = "forward"
         self.counter += 1
@@ -341,7 +341,7 @@ class LeftTurnLeftWallFound(DriverState):
     def next(self,distanceFlags, captainRequest, bumperState):
         if(self.counter > int(magicNumbers['RIGHT_TURN_TICKS']) + int(magicNumbers['BACKOFF_TICKS'])):
             return DriverStateMachine.rightTurnApproach
-        return DriverStateMachine.leftTurnRightWallFound
+        return DriverStateMachine.leftTurnLeftWallFound
     def toString(self):
         return "LeftTurnRightWallFound"
 
