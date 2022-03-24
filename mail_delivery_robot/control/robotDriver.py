@@ -156,14 +156,16 @@ class RightTurnApproach(DriverState):
 class RightTurnArrived(DriverState):
     def run(self,distanceFlags):
         action = String()
-        if(self.counter < int(magicNumbers['RIGHT_TURN_TICKS'])):
+        if(self.counter < int(magicNumbers['RIGHT_TURN_PRE_FORWARD_TICKS'])):
+            action.data = "forward"
+        elif(self.counter < int(magicNumbers['RIGHT_TURN_TICKS']) + int(magicNumbers['RIGHT_TURN_PRE_FORWARD_TICKS'])):
             action.data = "right"
-        elif(self.counter < int(magicNumbers['RIGHT_TURN_FORWARD_TICKS'])):
+        elif(self.counter < int(magicNumbers['RIGHT_TURN_FORIGHT_TURN_POST_FORWARD_TICKSRWARD_TICKS']) + int(magicNumbers['RIGHT_TURN_PRE_FORWARD_TICKS'])):
             action.data = "forward"
         self.counter += 1
         return action 
     def next(self,distanceFlags,captainRequest,bumperState):
-        if(self.counter > int(magicNumbers['RIGHT_TURN_FORWARD_TICKS'])):
+        if(self.counter > int(magicNumbers['RIGHT_TURN_POST_FORWARD_TICKS']) + int(magicNumbers['RIGHT_TURN_PRE_FORWARD_TICKS'])):
             return DriverStateMachine.wallFollow
         else:
             captainRequest = ""
