@@ -178,6 +178,7 @@ class Captain(Node):
         self.beaconSubscriber = self.create_subscription(String,'beacons', self.readBeacon,10)
 
     def passedBeacon(self,beacon):
+        mapGraph = []
         mapGraph = loadMap(mapGraph)
         currJunc = beaconToJunction(beacon)
         path = bfs(currJunc, 2)
