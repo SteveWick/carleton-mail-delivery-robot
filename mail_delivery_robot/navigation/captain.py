@@ -13,6 +13,8 @@ magicNumbers = {
     'BEACON_OUTLIER_THRESHOLD': 7,
 }
 
+beaconList = []
+
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
     with open('/var/local/magicNumbers.csv') as csvfile:
@@ -210,9 +212,10 @@ class Captain(Node):
         #     self.beacons[beacon.data.split(",")[0]] = JunctionSlopeTracker(10)
         #     self.beacons[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger())
 
-        if (int(beacon.data.split(",")[1]) > -40):
+        if (int(beacon.data.split(",")[1]) > -40 and beacon.data.split(",")[0] not in beaconList):
             self.get_logger().info('Passed beacon: "%s"' % beacon.data.split(",")[0])
             self.passedBeacon(beacon.data.split(",")[0])
+            beaconList.append(beacon.data.split(",")[0])
 
         if False:
             f = open('captainLog.csv', "a")
