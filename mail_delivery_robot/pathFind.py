@@ -119,8 +119,8 @@ def turnDirection(mapGraph, beaconID, junctionID):
 # Example
 mapGraph = loadMap(mapGraph)
 path = bfs(mapGraph,"11","2")
-print("Path going from 1 to 13: " + str(path))
-print("Starting going straight South from 1")
+# print("Path going from 1 to 13: " + str(path))
+# print("Starting going straight South from 1")
 
 count = 0
 for junction in path:

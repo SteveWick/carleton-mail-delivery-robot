@@ -193,7 +193,7 @@ class Captain(Node):
         mapGraph = loadMap(mapGraph)
         path = bfs(mapGraph,beacon, "2")
         self.get_logger().info('Path: "%s"' % path)
-        turn = turnDirection(mapGraph,beacon,path[0])
+        turn = turnDirection(mapGraph,beacon,path[1])
         self.get_logger().info('Next turn: "%s"' % turn)
         mapUpdate = String()
         mapUpdate.data = turn
