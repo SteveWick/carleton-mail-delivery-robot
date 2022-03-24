@@ -70,7 +70,7 @@ def beaconToJunction(mapGraph, beaconID):
     return -1
 
 # Returns the expected beacon if traveling from one junction to another
-def expectedBeacon(mapgraph, sourceJunction, destJunction):
+def expectedBeacon(mapGraph, sourceJunction, destJunction):
     for junction in mapGraph:
         if(junction[0] == destJunction):
             for beacon in junction[1]:

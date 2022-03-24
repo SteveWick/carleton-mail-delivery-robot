@@ -180,7 +180,7 @@ class Captain(Node):
     def passedBeacon(self,beacon):
         mapGraph = []
         mapGraph = loadMap(mapGraph)
-        currJunc = beaconToJunction(beacon)
+        currJunc = beaconToJunction(mapGraph,beacon)
         path = bfs(currJunc, 2)
         mapUpdate = String()
         mapUpdate.data = turnDirection(beacon,path[0])
