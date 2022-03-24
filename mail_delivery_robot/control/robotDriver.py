@@ -131,6 +131,10 @@ class WallFollow(DriverState):
             return DriverStateMachine.graze
         if(captainRequest == "rturn"):
             return DriverStateMachine.rightTurnApproach
+        if(captainRequest == "lturn"):
+            return DriverStateMachine.rightTurnApproach
+        if(captainRequest == "pass"):
+            return DriverStateMachine.rightTurnApproach
         return DriverStateMachine.wallFollow
     def toString(self):
         return "WallFollow"
