@@ -73,6 +73,7 @@ class Dock(DriverState):
     def toString(self):
         return "Dock"
 
+
 class VerifyWall(DriverState):
     def run(self,distanceFlags):
         action = String()
@@ -187,7 +188,7 @@ class HeadOnCollisionInitial(DriverState):
         self.counter += 1
         return action 
     def next(self,distanceFlags,captainRequest,bumperState):
-        
+
         if(self.counter > int(magicNumbers['COLLISION_RETURN_MIN_TICKS']) and distanceFlags["tooFar"]):
             self.counter = 0
             return DriverStateMachine.headOnCollisionAvoided
