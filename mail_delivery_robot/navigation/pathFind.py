@@ -81,10 +81,10 @@ def expectedBeacon(mapgraph, sourceJunction, destJunction):
 # Returns the turn direction given a beaconID and the target junction
 def turnDirection(mapGraph, beaconID, junctionID):
     turns = [
-        ["u-turn", "left", "straight", "right"],
-        ["right", "u-turn", "left", "straight"],
-        ["straight", "right", "u-turn", "left"],
-        ["left", "straight", "right", "u-turn"],
+        ["u-turn", "Lturn", "PassThrough", "RTurn"],
+        ["RTurn", "u-turn", "Lturn", "PassThrough"],
+        ["PassThrough", "RTurn", "u-turn", "Lturn"],
+        ["Lturn", "PassThrough", "RTurn", "u-turn"],
     ]
     for junction in mapGraph:
         count = 0

@@ -129,12 +129,12 @@ class WallFollow(DriverState):
             return DriverStateMachine.headOnCollisionInitial
         if(bumperState == "Rpressed"):
             return DriverStateMachine.graze
-        if(captainRequest == "rturn"):
+        if(captainRequest == "RTurn"):
             return DriverStateMachine.rightTurnApproach
-        if(captainRequest == "lturn"):
-            return DriverStateMachine.rightTurnApproach
-        if(captainRequest == "pass"):
-            return DriverStateMachine.rightTurnApproach
+        if(captainRequest == "Lturn"):
+            return DriverStateMachine.leftTurnApproach
+        if(captainRequest == "PassThrough"):
+            return DriverStateMachine.passThroughApproach
         return DriverStateMachine.wallFollow
     def toString(self):
         return "WallFollow"
