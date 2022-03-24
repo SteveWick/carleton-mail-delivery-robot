@@ -130,10 +130,13 @@ class WallFollow(DriverState):
         if(bumperState == "Rpressed"):
             return DriverStateMachine.graze
         if(captainRequest == "RTurn"):
+            captainRequest = 0
             return DriverStateMachine.rightTurnApproach
         if(captainRequest == "Lturn"):
+            captainRequest = 0
             return DriverStateMachine.leftTurnApproach
         if(captainRequest == "PassThrough"):
+            captainRequest = 0
             return DriverStateMachine.passThroughApproach
         return DriverStateMachine.wallFollow
     def toString(self):
