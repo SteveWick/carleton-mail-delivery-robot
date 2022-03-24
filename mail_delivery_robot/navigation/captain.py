@@ -84,7 +84,7 @@ class Captain(Node):
         self.mapPublisher.publish(mapUpdate)
 
     def readBeacon(self, beacon):
-        self.get_logger().debug('Received: "%s"' % beacon.data)
+        self.get_logger().info('Received: "%s"' % beacon.data)
         
         if beacon.data.split(",")[0] in self.junctions:
             if self.junctions[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger()):
