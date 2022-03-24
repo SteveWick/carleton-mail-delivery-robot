@@ -88,7 +88,10 @@ def idToVertexNum(mapGraph, id):
     return -1
 
 # breadth first search for shortest path in the graph. Returns array of junctionIDs of shortest path
-def bfs(mapGraph, source, dest):
+def bfs(mapGraph, sourceBeacon, dest):
+
+    source = beaconToNextJunction(mapGraph,sourceBeacon)
+
     root = idToVertexNum(mapGraph, source)
 
     visited = [False] * len(mapGraph)
@@ -132,6 +135,14 @@ def beaconToJunction(mapGraph, beaconID):
             if (beacon[0] == beaconID):
                 return junction[0]
     return -1
+
+# Returns the junctionID of the following junction for a given beaconID
+def beaconToNextJunction(mapGraph, beaconID):
+    for junction in mapGraph:
+        if(junction[0] == beaconToJunction(mapGraph,beaconID)):
+            for beacon in junction[1]:
+                if(beacon[0] == beaconID):
+                    return beacon[1]
 
 # Returns the expected beacon if traveling from one junction to another
 def expectedBeacon(mapGraph, sourceJunction, destJunction):
@@ -180,10 +191,8 @@ class Captain(Node):
     def passedBeacon(self,beacon):
         mapGraph = []
         mapGraph = loadMap(mapGraph)
-        currJunc = beaconToJunction(mapGraph,beacon)
-        self.get_logger().info('Curr Junction: "%s"' % currJunc)
-        path = bfs(mapGraph,currJunc, "2")
-        self.get_logger().info('New path: "%s"' % path)
+        path = bfs(mapGraph,beacon, "2")
+        self.get_logger().info('Path: "%s"' % path)
         turn = turnDirection(mapGraph,beacon,path[0])
         self.get_logger().info('Next turn: "%s"' % turn)
         mapUpdate = String()

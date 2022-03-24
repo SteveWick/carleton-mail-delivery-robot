@@ -7,8 +7,8 @@ mapGraph = []
 
 # Loads map from csv file
 def loadMap(mapGraph):
-    with open('/var/local/map.csv') as csvfile:
-    # with open('map.csv') as csvfile:
+    # with open('/var/local/map.csv') as csvfile:
+    with open('map.csv') as csvfile:
         reader = csv.reader(csvfile,delimiter=",")
         for row in reader:
             mapGraph.append((row[0],((row[1],row[2]),(row[3],row[4]),(row[5],row[6]),(row[7],row[8]))))
@@ -24,7 +24,10 @@ def idToVertexNum(mapGraph, id):
     return -1
 
 # breadth first search for shortest path in the graph. Returns array of junctionIDs of shortest path
-def bfs(mapGraph, source, dest):
+def bfs(mapGraph, sourceBeacon, dest):
+
+    source = beaconToNextJunction(mapGraph,sourceBeacon)
+
     root = idToVertexNum(mapGraph, source)
 
     visited = [False] * len(mapGraph)
@@ -69,6 +72,14 @@ def beaconToJunction(mapGraph, beaconID):
                 return junction[0]
     return -1
 
+# Returns the junctionID of the following junction for a given beaconID
+def beaconToNextJunction(mapGraph, beaconID):
+    for junction in mapGraph:
+        if(junction[0] == beaconToJunction(mapGraph,beaconID)):
+            for beacon in junction[1]:
+                if(beacon[0] == beaconID):
+                    return beacon[1]
+
 # Returns the expected beacon if traveling from one junction to another
 def expectedBeacon(mapGraph, sourceJunction, destJunction):
     for junction in mapGraph:
@@ -101,13 +112,13 @@ def turnDirection(mapGraph, beaconID, junctionID):
         if (sourceDirection != None and destDirection != None):
                 break
 
-    # print(turns[sourceDirection][destDirection])
+    print(turns[sourceDirection][destDirection])
     return turns[sourceDirection][destDirection]
 
 
 # Example
 mapGraph = loadMap(mapGraph)
-path = bfs(mapGraph,"1","13")
+path = bfs(mapGraph,"11","2")
 print("Path going from 1 to 13: " + str(path))
 print("Starting going straight South from 1")
 
