@@ -393,7 +393,7 @@ class RobotDriver(Node):
         self.bumperEventSubscriber = self.create_subscription(String,'bumpEvent',self.updateBumperState,10)
         timer_period = float(magicNumbers['TIMER_PERIOD']) #Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.rightTurnApproach)
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.wallFollow)
 
 
     def determineAction(self):
