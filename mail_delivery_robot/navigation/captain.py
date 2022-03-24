@@ -36,7 +36,7 @@ class JunctionSlopeTracker():
         self.signalSent = False
     
     def addDataPoint(self,dataPoint,logger):
-        if(len(self.averageQueue) != 0 and abs(int(dataPoint) - int(self.averageQueue[-1])) > magicNumbers['BEACON_OUTLIER_THRESHOLD']):
+        if(len(self.averageQueue) != 0 and abs(int(dataPoint) - int(self.averageQueue[-1])) > int(magicNumbers['BEACON_OUTLIER_THRESHOLD'])):
             return False
         
         #Remove data point exceeding window size N
