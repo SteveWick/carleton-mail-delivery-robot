@@ -180,6 +180,7 @@ class Captain(Node):
     def passedBeacon(self,beacon):
         mapGraph = []
         mapGraph = loadMap(mapGraph)
+        self.get_logger().info('Map Graph: "%s"' % str(mapGraph))
         currJunc = beaconToJunction(mapGraph,beacon)
         path = bfs(mapGraph,currJunc, 2)
         self.get_logger().info('New path: "%s"' % path)
