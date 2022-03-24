@@ -198,7 +198,7 @@ class Captain(Node):
         #     self.beacons[beacon.data.split(",")[0]] = JunctionSlopeTracker(10)
         #     self.beacons[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger())
 
-        if (beacon.data.split(",")[1] > -40):
+        if (int(beacon.data.split(",")[1]) > -40):
             self.get_logger().info('Passed beacon: "%s"' % beacon.data.split(",")[0])
             self.passedBeacon(beacon.data.split(",")[0])
 
