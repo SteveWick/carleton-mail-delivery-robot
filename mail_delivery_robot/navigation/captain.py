@@ -190,14 +190,17 @@ class Captain(Node):
     def readBeacon(self, beacon):
         self.get_logger().info('Received: "%s"' % beacon.data)
         
-        if beacon.data.split(",")[0] in self.beacons:
-            if self.beacons[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger()):
-                self.get_logger().info('Passed beacon: "%s"' % beacon.data.split(",")[0])
-                self.passedBeacon(beacon.data.split(",")[0])
-        else:
-            self.beacons[beacon.data.split(",")[0]] = JunctionSlopeTracker(10)
-            self.beacons[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger())
+        # if beacon.data.split(",")[0] in self.beacons:
+        #     if self.beacons[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger()):
+        #         self.get_logger().info('Passed beacon: "%s"' % beacon.data.split(",")[0])
+        #         self.passedBeacon(beacon.data.split(",")[0])
+        # else:
+        #     self.beacons[beacon.data.split(",")[0]] = JunctionSlopeTracker(10)
+        #     self.beacons[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger())
 
+        if (beacon.data.split(",")[1] < -40):
+            self.get_logger().info('Passed beacon: "%s"' % beacon.data.split(",")[0])
+            self.passedBeacon(beacon.data.split(",")[0])
 
         if False:
             f = open('captainLog.csv', "a")
