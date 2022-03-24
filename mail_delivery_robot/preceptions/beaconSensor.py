@@ -39,7 +39,7 @@ class BeaconReader(Node):
         for dev in devices:
             for beacon in self.beacons:
                 if(self.beacons[beacon] == dev.addr):
-                    self.get_logger().debug("Device {} ({}), RSSI={} dB".format(dev.addr, dev.addrType, dev.rssi))
+                    self.get_logger().info("Device {} ({}), RSSI={} dB".format(dev.addr, dev.addrType, dev.rssi))
                     beaconData.data = beacon + "," + str(dev.rssi)
                     self.publisher_.publish(beaconData)
                     if True:
