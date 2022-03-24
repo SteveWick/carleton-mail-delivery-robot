@@ -181,9 +181,9 @@ class Captain(Node):
         mapGraph = []
         mapGraph = loadMap(mapGraph)
         currJunc = beaconToJunction(mapGraph,beacon)
-        path = bfs(currJunc, 2)
+        path = bfs(mapGraph,currJunc, 2)
         mapUpdate = String()
-        mapUpdate.data = turnDirection(beacon,path[0])
+        mapUpdate.data = turnDirection(mapGraph,beacon,path[0])
         self.mapPublisher.publish(mapUpdate)
         self.get_logger().info('New path: "%s"' % path)
         self.get_logger().info('Next turn: "%s"' % mapUpdate.data)
