@@ -398,7 +398,7 @@ class RobotDriver(Node):
 
     def determineAction(self):
         action = self.driverStateMachine.run(self.distanceFlags,self.captainRequest)
-        self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
+        self.get_logger().debug("DriverState: " + self.driverStateMachine.currentState.toString())
         for key in self.distanceFlags:
             self.get_logger().debug(str(key) + " : " + str(self.distanceFlags[key]))
 
