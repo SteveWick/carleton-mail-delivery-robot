@@ -121,6 +121,7 @@ def main():
     rclpy.init()
     irsensor = IRSensor()
 
+    # Run irsensor when not blocked by shutdown
     rclpy.spin(irsensor)
     
 
