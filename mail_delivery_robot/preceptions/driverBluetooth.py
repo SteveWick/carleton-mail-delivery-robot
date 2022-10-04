@@ -20,9 +20,12 @@ averages = dict()
     returns RSSIs in a dictionary with MAC addresses as the key
 '''
 def __read_RSSI():
+    # Scans for beacons over 0.2 seconds and appends found ones to a list
     reader = BeaconReader()
     ble_list = Scanner().scan(0.2)
     found_beacons = dict()
+
+    # Link each found beacon to a mapped location in the dict
     for dev in ble_list:
         if dev.addr in reader.read_beacons().keys():
             found_beacons[dev.addr] = dev.rssi
@@ -44,6 +47,7 @@ def __get_distance():
 
     distances = dict()
     for MAC in MAC_ADDRs:
+        # Calculate distance and store it
         distances[MAC] = pow(10,(reader.read_beacons()[MAC][1] - read_rssi[MAC])/(10*reader.read_beacons()[MAC][0]))
     
     return distances
@@ -53,6 +57,8 @@ def __calc_average(mac, distance):
     
     averages[mac].insert(0, distance)
     averages[mac].pop(5)
+
+    # Take average of distances and check if distance is within 25% of average
     avg = sum(averages[mac])/5
     if distance < avg * 1.25 and distance > avg * 0.75:
         return True
@@ -60,7 +66,8 @@ def __calc_average(mac, distance):
 
 def main():
     global averages
-    
+
+    # Create publisher
     pub = rospy.Publisher('beacons', String, queue_size=5)
     rospy.init_node('bluetoothBeacons', anonymous=True)
     rate = rospy.Rate(10)
@@ -127,7 +134,7 @@ def main():
                 rospy.loginfo('Beacon: '+str(MAC)+','+str(avg[MAC])+'m')
                 to_send = to_send +str(MAC)+','+str(avg[MAC]) + '\n'
             
-            # If at least 1 beacon wasnt an outlier, then publish
+            # If at least 1 beacon wasn't an outlier, then publish
             if not to_send == '':
                 pub.publish(to_send)
 
