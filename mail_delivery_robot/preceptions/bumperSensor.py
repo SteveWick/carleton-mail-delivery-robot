@@ -27,7 +27,10 @@ class BumperSensor(Node):
         super().__init__('bumper_sensor')
         self.counter = 0
         self.lastState = ""
+        # Create subscriber, msg_type = Bumper, topic = "bumper", callback = self.readBump
         self.bumperSubscriber = self.create_subscription(Bumper,'bumper', self.readBump,10)
+
+        # Publisher that sends String messages named bumpEvent
         self.publisher_ = self.create_publisher(String, 'bumpEvent' , 10)
  
 
