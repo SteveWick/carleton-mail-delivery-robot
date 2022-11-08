@@ -1,0 +1,4 @@
+<launch>
+    <node name="bumper_sensor" pkg="preceptions" type="bumperSensor.py" />
+    <test name="test_bumper_sensor" pkg="preceptions" type="bumper_sensor_test.py" />
+</launch>
