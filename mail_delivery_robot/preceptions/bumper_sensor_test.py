@@ -13,6 +13,7 @@ def simulate_message():
     message = ""
     publisher.publish(message)
     sleep(1)
+    del publisher
 
 
 # Test class for testing the throughput of the bumper sensor node
