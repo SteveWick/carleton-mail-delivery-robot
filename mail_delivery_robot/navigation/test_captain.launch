@@ -1,0 +1,4 @@
+<launch>
+    <node name="captain" pkg="navigation" type="captain.py" />
+    <test name="captain_test" pkg="navigation" type="captain_test.py" />
+</launch>

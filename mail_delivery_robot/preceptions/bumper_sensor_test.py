@@ -37,4 +37,4 @@ class BumperSensorNodeTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    rostest.rosrun('Tester', 'test_bumper_sensor', BumperSensorNodeTest)
+    rostest.rosrun('preceptions', 'test_bumper_sensor', BumperSensorNodeTest)
