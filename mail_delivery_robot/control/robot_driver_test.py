@@ -28,7 +28,7 @@ def simulate_message():
     del bump_event_publisher
 
 
-# Test class for testing the throughput of the captain node
+# Test class for testing the throughput of the Robot Driver node
 class RobotDriverNodeTest(unittest.TestCase):
     dataTransferSuccess = False
 
