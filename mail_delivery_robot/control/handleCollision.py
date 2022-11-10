@@ -8,17 +8,12 @@ from std_msgs.msg import String
 
 def rosMain():
     rospy.init_node('handleCollision', anonymous=True)
-    publisher = rospy.Publisher('actions', String, queue_size=10)
-    # subscriber to preceptions
-    rate = rospy.Rate(5)
     
-    while not rospy.is_shutdown():
-        command = -1
-        if command == -1:
-            pass
-        else:
-            publisher.publish(command)
-        rate.sleep()
+    # creates publisher to actions 
+    publisher = rospy.Publisher('actions', String, queue_size=10)
+
+    # no actual collision behaviour in this file 
+    # TODO: add collision handling behaviour to this file  
 
 if __name__ == '__main__':
     try:
