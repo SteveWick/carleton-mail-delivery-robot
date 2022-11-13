@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import unittest
 from std_msgs.msg import String
-from create_msgs.msg import Bumper
 from time import sleep
 import rclpy
 
@@ -16,10 +15,7 @@ class CaptainNodeTest(unittest.TestCase):
 
     # This function simulates how a beacon event is triggered
     def simulate_message(self):
-        # Publisher that sends String messages named bumpEvent
-        # self.publisher = self.test_node.create_publisher(String, 'bumper', 10)
-        # publisher = rospy.Publisher('bumper', String, 10)
-        # TODO need to extract the exact message received from a bumper topic
+        # TODO need to extract the exact message received from a beacons topic
         message = String()
         message.data = ""
         self.publisher.publish(message)
@@ -43,10 +39,7 @@ class CaptainNodeTest(unittest.TestCase):
         self.assertIn(topic2, str(topics), "The expected topic2 not created")
 
     def test_node_throughput(self):
-        # Create subscriber, msg_type = Bumper, topic = "bumper", callback = self.callback
-        # self.subscriber = self.test_node.create_subscription(String, 'bumpEvent', self.callback, 10)
-        # self.publisher = self.test_node.create_publisher(String, 'bumper', 10)
-        # rclpy.spin(self.test_node)
+
         self.simulate_message()
         self.assertEqual(True, self.message_properly_processed, "Message not processed properly")
 

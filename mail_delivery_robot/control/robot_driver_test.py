@@ -1,390 +1,57 @@
 #!/usr/bin/env python
 import unittest
-import robotDriver
-import rospy
 from std_msgs.msg import String
 from time import sleep
-import rostest
-
-
-# This function simulates how messages are sent to the robot driver node
-def simulate_message():
-    perception_publisher = rospy.Publisher('preceptions', String, 10)
-    navigation_map_publisher = rospy.Publisher('navigationMap', String, 10)
-    bump_event_publisher = rospy.Publisher('bumpEvent', String, 10)
-
-    # TODO need to extract the exact message received from the beacons topic
-    perception_message = ""
-    navigation_map_message = ""
-    bump_event_message = ""
-
-    perception_publisher.publish(perception_message)
-    navigation_map_publisher.publish(navigation_map_message)
-    bump_event_publisher.publish(bump_event_message)
-
-    sleep(1)
-    del perception_publisher
-    del navigation_map_publisher
-    del bump_event_publisher
+import rclpy
 
 
 # Test class for testing the throughput of the Robot Driver node
 class RobotDriverNodeTest(unittest.TestCase):
-    dataTransferSuccess = False
+    message_properly_processed = False
 
-    def callback(self, data):
+    def callback(self):
         # TODO add checking the content of the message processed
-        self.dataTransferSuccess = True
+        self.message_properly_processed = True
 
-    def test_handling_bump_event(self):
-        rospy.init_node('test_captain')
-        rospy.subscriber('/actions', String, self.callback)
-        simulate_message()
+    # This function simulates how messages are sent to the robot driver node
+    def simulate_message(self):
+        # TODO need to extract the exact message received
+        perception_message = String()
+        navigation_map_message = String()
+        bump_event_message = String()
 
-        counter = 0
-        while not rospy.is_shutdown() and counter < 5 and (not self.dataTransferSuccess):
-            sleep(1)
-            counter += 1
+        perception_message.data = ""
+        navigation_map_message.data = ""
+        bump_event_message.data = ""
 
-        self.assertEqual(True, self.dataTransferSuccess)
-
-
-class DriverStateMachineTest(unittest.TestCase):
-    testSuccess = False
-
-    def __init__(self):
-        self.junctionSlopeTracker = None
-        self.dataPoint = None
+        self.perception_publisher.publish(perception_message)
+        self.navigation_map_publisher.publish(navigation_map_message)
+        self.bump_event_publisher.publish(bump_event_message)
 
     def setUp(self):
-        self.junctionSlopeTracker = JunctionSlopeTracker(10)
-        # TODO Need to determine the exact format of the datapoint input
-        # self.dataPoint = None
-
-    def test_addDataPoint(self):
-        self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-                                                                      self.get_logger()), 'Failed to add point')
+        rclpy.init()
+        self.test_node = rclpy.create_node("test_robot_driver")
+        self.subscriber = self.test_node.create_subscription(String, 'actions', self.callback, 10)
+        self.perception_publisher = self.test_node.create_publisher(String, 'preceptions', 10)
+        self.navigation_map_publisher = self.test_node.create_publisher(String, 'navigationMap', 10)
+        self.bump_event_publisher = self.test_node.create_publisher(String, 'bumpEvent', 10)
+        sleep(2)
 
     def tearDown(self):
-        self.junctionSlopeTracker.dispose()
+        self.test_node.destroy_node()
+        rclpy.shutdown()
 
+    def test_topic_name(self):
+        topics = self.test_node.get_topic_names_and_types()
+        topic = "actions"
+        topic2 = "preceptions"
+        self.assertIn(topic, str(topics), "The expected topic not created")
+        self.assertIn(topic2, str(topics), "The expected topic2 not created")
 
-# class DriverStateTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
+    def test_node_throughput(self):
+        self.simulate_message()
+        self.assertEqual(True, self.message_properly_processed, "Message not processed properly")
 
-# class DockTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class VerifyWallTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class NoWallTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class WallFollowTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class RightTurnApproachTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class RightTurnArrivedTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class HeadOnCollisionInitialTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class HeadOnCollisionAvoidedTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class GrazeTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class PassThroughApproachTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class PassThroughArrived(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class LeftTurnApproachTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-
-# class LeftTurnPassThroughTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-# class LeftTurnRightWallFoundTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
-
-# class LeftTurnLeftWallFoundTest(unittest.TestCase):
-#     testSuccess = False
-#
-#     def __init__(self):
-#         self.junctionSlopeTracker = None
-#         self.dataPoint = None
-#
-#     def setUp(self):
-#         self.junctionSlopeTracker = JunctionSlopeTracker(10)
-#         # TODO Need to determine the exact format of the datapoint input
-#         # self.dataPoint = None
-#
-#     def test_addDataPoint(self):
-#         self.assertEqual(True, self.junctionSlopeTracker.addDataPoint(self.junctionSlopeTracker, self.dataPoint,
-#                                                                       self.get_logger()), 'Failed to add point')
-#
-#     def tearDown(self):
-#         self.junctionSlopeTracker.dispose()
 
 if __name__ == '__main__':
-    rostest.rosrun('control', 'test_robot_driver', RobotDriverNodeTest)
-    rostest.rosrun('navigation', 'test_junction_slope_tracker', JunctionSlopeTracker)
+    unittest.main()
