@@ -3,7 +3,7 @@
 # @author: Simon Yacoub
 
 from std_msgs.msg import String
-from create_msgs.msg import Bumper 
+from create_msgs.msg import Bumper
 import rclpy
 from rclpy.node import Node
 import csv
@@ -13,32 +13,35 @@ magicNumbers = {
     'MAX_BUMP_EVENT_PUBLISH_TICKS': 30
 }
 
+
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
     with open('/var/local/magicNumbers.csv') as csvfile:
-        reader = csv.reader(csvfile,delimiter=",")
+        reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
-            magicNumbers[row[0]]= row[1]
+            magicNumbers[row[0]] = row[1]
     return magicNumbers
 
+
 DEBUG = False
+
+
 class BumperSensor(Node):
     def __init__(self):
         super().__init__('bumper_sensor')
         self.counter = 0
         self.lastState = ""
         # Create subscriber, msg_type = Bumper, topic = "bumper", callback = self.readBump
-        self.bumperSubscriber = self.create_subscription(Bumper,'bumper', self.readBump,10)
+        self.bumperSubscriber = self.create_subscription(Bumper, 'bumper', self.readBump, 10)
 
         # Publisher that sends String messages named bumpEvent
-        self.publisher_ = self.create_publisher(String, 'bumpEvent' , 10)
- 
+        self.publisher_ = self.create_publisher(String, 'bumpEvent', 10)
 
     def readBump(self, data):
         # Extract the publisher and the message data
         is_left_pressed = data.is_left_pressed
-        is_right_pressed = data.is_right_pressed 
-        
+        is_right_pressed = data.is_right_pressed
+
         # Bumper light sensors (Create 2 only) in order from left to right
         # Value = true if an obstacle detected
         is_light_left = data.is_light_left
@@ -49,10 +52,14 @@ class BumperSensor(Node):
         is_light_right = data.is_light_right
 
         bumpEvent = String()
-        if(is_left_pressed and is_right_pressed):bumpEvent.data = "Cpressed"
-        elif(is_left_pressed):bumpEvent.data = "Lpressed"
-        elif(is_right_pressed):bumpEvent.data = "Rpressed"
-        else: bumpEvent.data = "unpressed"
+        if (is_left_pressed and is_right_pressed):
+            bumpEvent.data = "Cpressed"
+        elif (is_left_pressed):
+            bumpEvent.data = "Lpressed"
+        elif (is_right_pressed):
+            bumpEvent.data = "Rpressed"
+        else:
+            bumpEvent.data = "unpressed"
 
         # if(data.is_light_front_right or  is_light_center_right):
         #     message.data = "bumper detects an object to the left"
@@ -60,7 +67,7 @@ class BumperSensor(Node):
         #     message.data = "bumper detects an object to the right"
 
         # Publish the perception
-        if(self.lastState != bumpEvent.data or self.counter > int(magicNumbers['MAX_BUMP_EVENT_PUBLISH_TICKS'])):
+        if (self.lastState != bumpEvent.data or self.counter > int(magicNumbers['MAX_BUMP_EVENT_PUBLISH_TICKS'])):
             self.lastState = bumpEvent.data
             self.get_logger().debug(bumpEvent.data)
             self.publisher_.publish(bumpEvent)
@@ -77,11 +84,7 @@ def main():
     bumper_sensor = BumperSensor()
 
     rclpy.spin(bumper_sensor)
-    
 
 
 if __name__ == '__main__':
     main()
-
-
-
