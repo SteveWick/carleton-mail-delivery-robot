@@ -1,4 +1,0 @@
-<launch>
-    <node name="robot_driver" pkg="control" type="robot_driver.py" />
-    <test name="robot_driver_test" pkg="control" type="robot_driver_test.py" />
-</launch>
