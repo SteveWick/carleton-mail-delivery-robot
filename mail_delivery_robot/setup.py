@@ -8,7 +8,7 @@ setup(
     name=package_name,
     version='0.0.0',
     packages=[package_name],
-    py_modules=["preceptions.IRDistanceCalc","control.actionTranslator","control.robotDriver","navigation.captain","preceptions.beaconSensor","preceptions.bumperSensor"],
+    py_modules=["tests.robot_driver_test","preceptions.IRDistanceCalc","control.actionTranslator",'tests.action_translator_test',"control.robotDriver","navigation.captain", "preceptions.beaconSensor","preceptions.bumperSensor"],
     data_files=[
         # Install marker file in the package index
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
@@ -26,6 +26,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'robot_driver_test = tests.robot_driver_test:main', 
+            'action_translator_test = tests.action_translator_test:main', 
             'IRSensor = preceptions.IRDistanceCalc:main',
             'beacon_reader = preceptions.beaconSensor:main',
             'action_translator = control.actionTranslator:main',

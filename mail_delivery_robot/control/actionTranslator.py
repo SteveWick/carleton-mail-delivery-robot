@@ -14,9 +14,8 @@ from std_msgs.msg import Empty
 from geometry_msgs.msg import Twist
 import time
 import csv
-
+import os
 # This script is meant to take all the action decisions from our reasoner and publish them to the roomba (via cmd_vel)
-
 
 # ~~~~ DEFAULTS ~~~~~
 magicNumbers = {
@@ -36,11 +35,11 @@ magicNumbers = {
     'BLEFT_X_SPEED': -0.1,
     'BLEFT_Z_SPEED': 0.5,
 }
-
+         
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
-    with open('/var/local/magicNumbers.csv') as csvfile:
+    with open("/var/local/magicNumbers.csv") as csvfile:
         reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
             magicNumbers[row[0]] = row[1]
@@ -51,22 +50,27 @@ class ActionTranslator(Node):
     def __init__(self):
         super().__init__('action_translator')
         self.drivePublisher = self.create_publisher(Twist, 'cmd_vel', 2)
-        self.undockPublisher = self.create_publisher(Empty, 'dock', 1)
-        self.dockPublisher = self.create_publisher(Empty, 'undock', 1)
+          
+          
+        #unimplemented docking behaviour 
+            #self.undockPublisher = self.create_publisher(Empty, 'dock', 1)
+            # self.dockPublisher = self.create_publisher(Empty, 'undock', 1)
 
         self.subscription = self.create_subscription(String, 'actions', self.decodeAction, 10)
 
     # Decode and execute the action
     def decodeAction(self, data):
+        action = str(data.data)
+        self.get_logger().info(action)
         actionMessage = Twist()  # the mess
 
         # Get the parameters
-        action = str(data.data)
-        # (drivePublisher, dockPublisher, undockPublisher) = args
+        #(drivePublisher, dockPublisher, undockPublisher) = args
 
         # handle basic movement commands from actions topic
         actionMessage = getTwistMesg(action)
         if (action == "left"):  # Does a 45 degree turn left (stops robot first)
+            self.get_logger().info("left action translation")
             actionMessage = getTwistMesg("left")
             tmp = String()
             tmp.data = "stop"
@@ -79,16 +83,25 @@ class ActionTranslator(Node):
             tmp.data = "stop"
             self.drivePublisher.publish(actionMessage)
             self.get_logger().info("Action: right")
-
-        # Handle the docking station cases
-        if action == "dock":
-            self.dockPublisher.publish(Empty())
-        elif action == 'undock':
-            self.undockPublisher.publish(Empty())
-        else:
-            # publish action
+        elif (action == "forward"): 
+            actionMessage = getTwistMesg("forward")
+            tmp = String()
+            tmp.data = "forward"
             self.drivePublisher.publish(actionMessage)
+            self.get_logger().info("Action: forward")
+        ## TODO ## 
+        ## IMPLEMENT TRANSLATIONS FOR OTHER ACTIONS ##
 
+
+        ## TODO ## 
+        ## IMPLEMENT DOCKING BEHAVIOUR HERE ##
+        
+        if action == "dock":
+            self.dockPublisher.publish()
+        elif action == 'undock':
+            self.undockPublisher.publish()
+        else:
+            self.drivePublisher.publish(actionMessage)
 
 '''
 Get a Twist message which consists of a linear and angular component which can be negative or positive.
@@ -106,6 +119,7 @@ Limits:
 
 def getTwistMesg(action):
     message = Twist()
+    
 
     if action == "forward":
         message.linear.x = float(magicNumbers['FORWARD_X_SPEED'])
