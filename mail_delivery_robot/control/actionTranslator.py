@@ -50,12 +50,10 @@ class ActionTranslator(Node):
     def __init__(self):
         super().__init__('action_translator')
         self.drivePublisher = self.create_publisher(Twist, 'cmd_vel', 2)
-          
-          
         #unimplemented docking behaviour 
             #self.undockPublisher = self.create_publisher(Empty, 'dock', 1)
-            # self.dockPublisher = self.create_publisher(Empty, 'undock', 1)
-
+        # self.dockPublisher = self.create_publisher(Empty, 'undock', 1)
+        
         self.subscription = self.create_subscription(String, 'actions', self.decodeAction, 10)
 
     # Decode and execute the action
@@ -69,39 +67,8 @@ class ActionTranslator(Node):
 
         # handle basic movement commands from actions topic
         actionMessage = getTwistMesg(action)
-        if (action == "left"):  # Does a 45 degree turn left (stops robot first)
-            self.get_logger().info("left action translation")
-            actionMessage = getTwistMesg("left")
-            tmp = String()
-            tmp.data = "stop"
-            self.drivePublisher.publish(actionMessage)
-            self.get_logger().info("Action: left")
-
-        elif (action == "right"):  # Does 45 degree turn right (stops robot first)
-            actionMessage = getTwistMesg("right")
-            tmp = String()
-            tmp.data = "stop"
-            self.drivePublisher.publish(actionMessage)
-            self.get_logger().info("Action: right")
-        elif (action == "forward"): 
-            actionMessage = getTwistMesg("forward")
-            tmp = String()
-            tmp.data = "forward"
-            self.drivePublisher.publish(actionMessage)
-            self.get_logger().info("Action: forward")
-        ## TODO ## 
-        ## IMPLEMENT TRANSLATIONS FOR OTHER ACTIONS ##
-
-
-        ## TODO ## 
-        ## IMPLEMENT DOCKING BEHAVIOUR HERE ##
-        
-        if action == "dock":
-            self.dockPublisher.publish()
-        elif action == 'undock':
-            self.undockPublisher.publish()
-        else:
-            self.drivePublisher.publish(actionMessage)
+    
+        self.drivePublisher.publish(actionMessage)
 
 '''
 Get a Twist message which consists of a linear and angular component which can be negative or positive.
