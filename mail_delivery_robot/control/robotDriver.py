@@ -34,6 +34,8 @@ magicNumbers = {
     'BACKOFF_TICKS': 2,
 }
 
+# ~~~~ DEBUG MODE ~~~~
+DEBUG_MODE = False
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
@@ -446,9 +448,11 @@ class RobotDriver(Node):
 
     def determineAction(self):
         action = self.driverStateMachine.run(self.distanceFlags, self.captainRequest)
-        self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
-        for key in self.distanceFlags:
-            self.get_logger().info(str(key) + " : " + str(self.distanceFlags[key]))
+
+        if (DEBUG_MODE):
+            self.get_logger().info("DriverState: " + self.driverStateMachine.currentState.toString())
+            for key in self.distanceFlags:
+                self.get_logger().info(str(key) + " : " + str(self.distanceFlags[key]))
 
         if (action.data != 0):
             self.get_logger().debug("Publishing: " + action.data)
@@ -479,7 +483,9 @@ class RobotDriver(Node):
             self.distanceFlags["wideAngle"] = float(self.angle) > float(magicNumbers['MAX_TARGET_WALL_ANGLE'])
 
             self.driverStateMachine.next(self.distanceFlags, self.captainRequest, self.bumperState)
-        self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
+        if (DEBUG_MODE):
+            self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
+
 
     def updateBumperState(self, data):
         self.bumperState = data.data
