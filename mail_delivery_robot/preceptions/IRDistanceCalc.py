@@ -151,8 +151,6 @@ def main():
     rclpy.spin(irsensor)
     
 if __name__ == '__main__':
-<<<<<<< HEAD
     main()
-=======
-    main()
->>>>>>> e29b3279d68c6735f18fc8edc4074c9621428c5d
+
+
