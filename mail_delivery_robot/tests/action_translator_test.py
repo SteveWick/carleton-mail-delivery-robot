@@ -63,7 +63,7 @@ class ActionTranslatorTest(Node):
         if ( self.current_message == 'left' and twist_message.linear.x == float(self.magicNumbers['ZERO_SPEED']) 
                 and twist_message.angular.z == float(self.magicNumbers['LEFT_Z_SPEED'])):
             
-            self.left_message_properly_proccesed = True
+           
             self.get_logger().info("TEST 1 PASSED: Left movement twist values as expected")
             ##Increment test count so next loop runs test 2
             self.test_count = 1
@@ -81,6 +81,48 @@ class ActionTranslatorTest(Node):
             
             self.get_logger().info("TEST 3 PASSED: stop movement twist values as expected")
             self.test_count = 3
+        elif(self.current_message == 'forward'
+                and twist_message.linear.x == float(self.magicNumbers['FORWARD_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['ZERO_SPEED'])
+            ):
+            self.get_logger().info("TEST 4 PASSED: forward movement twist values as expected")
+            self.test_count = 4
+        elif(self.current_message == 'slowForward'
+                and twist_message.linear.x == float(self.magicNumbers['SLOW_FORWARD_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['ZERO_SPEED'])
+                ):
+            self.get_logger().info("TEST 5 PASSED: slow forward movement twist values as expected")
+            self.test_count = 5; 
+        elif(self.current_message == 'creepForward'
+                and twist_message.linear.x == float(self.magicNumbers['CREEP_FORWARD_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['ZERO_SPEED'])
+                ):
+            self.get_logger().info("TEST 6 PASSED: cree[ forward movement twist values as expected")
+            self.test_count = 6; 
+        elif(self.current_message == 'sright'
+                and twist_message.linear.x == float(self.magicNumbers['SRIGHT_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['SRIGHT_Z_SPEED'])
+                ):
+            self.get_logger().info("TEST 7 PASSED: slight right movement twist values as expected")
+            self.test_count = 7; 
+        elif(self.current_message == 'sleft'
+                and twist_message.linear.x == float(self.magicNumbers['SLEFT_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['SLEFT_Z_SPEED'])
+                ):
+            self.get_logger().info("TEST 8 PASSED: slight left movement twist values as expected")
+            self.test_count = 8; 
+        elif(self.current_message == 'avoidright'
+                and twist_message.linear.x == float(self.magicNumbers['AVOIDRIGHT_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['AVOIDRIGHT_Z_SPEED'])
+                ):
+            self.get_logger().info("TEST 5 PASSED: avoid right movement twist values as expected")
+            self.test_count = 9; 
+        elif(self.current_message == 'bleft'
+                and twist_message.linear.x == float(self.magicNumbers['BLEFT_X_SPEED'])
+                and twist_message.angular.z == float(self.magicNumbers['BLEFT_Z_SPEED'])
+                ):
+            self.get_logger().info("TEST 9 PASSED: bleft movement twist values as expected")
+            self.test_count = 10; 
         else:
             self.get_logger().info(f"TEST FAILED - INVALID TWiST VALUES for {self.current_message} {twist_message.linear.x}, {twist_message.angular.z}")
         
@@ -101,15 +143,48 @@ class ActionTranslatorTest(Node):
             self.current_message = "right" 
             action_message.data = "right"
             self.action_publisher.publish(action_message)
-
         ##When test twp completed, run test three
         elif self.test_count == 2:
             self.get_logger().info(f"Sending Stop")  
             self.current_message = "stop"  
             action_message.data = "stop"
             self.action_publisher.publish(action_message)
+        elif self.test_count == 3:
+            self.get_logger().info(f"Sending forward")
+            self.current_message = "forward"
+            action_message.data = "forward"
+            self.action_publisher.publish(action_message)
+        elif self.test_count == 4:
+            self.get_logger().info(f"Sending slow forward")
+            self.current_message = "slowForward"
+            action_message.data = "slowForward"
+            self.action_publisher.publish(action_message)
+        elif self.test_count == 5:
+            self.get_logger().info(f"Sending creep forward")
+            self.current_message = "creepForward"
+            action_message.data = "creepForward"
+            self.action_publisher.publish(action_message)
+        elif self.test_count == 6:
+            self.get_logger().info(f"Sending slight right")
+            self.current_message = "sright"
+            action_message.data = "sright"
+            self.action_publisher.publish(action_message)
+        elif self.test_count == 7:
+            self.get_logger().info(f"Sending slight left")
+            self.current_message = "sleft"
+            action_message.data = "sleft"
+            self.action_publisher.publish(action_message)
+        elif self.test_count == 8:
+            self.get_logger().info(f"Sending avoid right")
+            self.current_message = "avoidright"
+            action_message.data = "avoidright"
+            self.action_publisher.publish(action_message)
+        elif self.test_count == 9: 
+            self.get_logger().info(f"Sending bleft")
+            self.current_message = "bleft"
+            action_message.data = "bleft"
+            self.action_publisher.publish(action_message)
         else:
-            
             self.get_logger().info("TESTS PASSED SUCESSFULLY")
             
             #Exit
