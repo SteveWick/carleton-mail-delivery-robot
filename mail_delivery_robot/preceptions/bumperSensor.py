@@ -1,26 +1,26 @@
 #!/usr/bin/env python
 
-# @author: Simon Yacoub
+# @author: Simon Yacoub, Jacob Charpentier
 
 from std_msgs.msg import String
 from create_msgs.msg import Bumper
 import rclpy
 from rclpy.node import Node
 import csv
-
-# ~~~~ DEFAULTS ~~~~~
-magicNumbers = {
-    'MAX_BUMP_EVENT_PUBLISH_TICKS': 30
-}
-
+import os
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
-    with open('/var/local/magicNumbers.csv') as csvfile:
+    magicNumbers = {}
+    ROOT_DIR = os.getcwd()
+    with open(f'{ROOT_DIR}/src/carleton-mail-delivery-robot/mail_delivery_robot/magicNumbers.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
             magicNumbers[row[0]] = row[1]
     return magicNumbers
+
+
+magicNumbers = loadNumberOverrides()
 
 
 DEBUG = False
@@ -76,10 +76,6 @@ class BumperSensor(Node):
 
 
 def main():
-    try:
-        loadNumberOverrides()
-    except:
-        print("No tuning file found!")
     rclpy.init()
     bumper_sensor = BumperSensor()
 
