@@ -1,26 +1,26 @@
 #!/usr/bin/env python
-# @author: Stephen Wicklund
-
+# @author: Stephen Wicklund, Jacob Charpentier
 # SUBSCRIBER:   beacons
 # PUBLISHER:    navigationMap
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 import csv
-
-# ~~~~ DEFAULTS ~~~~~
-magicNumbers = {
-    'BEACON_OUTLIER_THRESHOLD': 7,
-}
+import os
 
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
-    with open('/var/local/magicNumbers.csv') as csvfile:
+    magicNumbers = {}
+    ROOT_DIR = os.getcwd()
+    with open(f'{ROOT_DIR}/src/carleton-mail-delivery-robot/mail_delivery_robot/magicNumbers.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
             magicNumbers[row[0]] = row[1]
     return magicNumbers
+
+
+magicNumbers = loadNumberOverrides()
 
 
 def sign(x):
@@ -97,6 +97,7 @@ class Captain(Node):
             self.junctions[beacon.data.split(",")[0]] = JunctionSlopeTracker(10)
             self.junctions[beacon.data.split(",")[0]].addDataPoint(beacon.data.split(",")[1], self.get_logger())
 
+        # TODO: Determine if this code can be removed or if it should be reachable
         if False:
             f = open('captainLog.csv', "a")
             f.write(beacon.data + "\n")
@@ -107,10 +108,6 @@ DEBUG = False
 
 
 def main():
-    try:
-        loadNumberOverrides()
-    except:
-        print("No tuning file found!")
     rclpy.init()
     captain = Captain()
     # rclpy.spin(captain)

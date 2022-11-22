@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-# @author: Emily Clarke
+# @author: Emily Clarke, Jacob Charpentier
 
 import csv
+import os
 
 # ~~~~ DEFAULTS ~~~~~
 magicNumbers = {
@@ -54,10 +55,10 @@ magicNumbers = {
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
-    with open('/var/local/magicNumbers.csv') as csvfile:
-    # with open('magicNumbers.csv') as csvfile:
-        reader = csv.reader(csvfile,delimiter=",")
+    magicNumbers = {}
+    ROOT_DIR = os.getcwd()
+    with open(f'{ROOT_DIR}/src/carleton-mail-delivery-robot/mail_delivery_robot/magicNumbers.csv') as csvfile:
+        reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
-            magicNumbers[row[0]]= row[1]
+            magicNumbers[row[0]] = row[1]
     return magicNumbers
-
