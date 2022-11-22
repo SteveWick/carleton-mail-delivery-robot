@@ -5,7 +5,8 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from time import sleep
 import rclpy
-from rclpy.node import Node 
+from rclpy.node import Node
+import csv, os
 
 # Test class for testing the actionTranslator Node
 # Publishes each of the types of actions avaialble to simulate the robotDriver
@@ -15,27 +16,29 @@ class ActionTranslatorTest(Node):
     test_count = 0
     current_message = "left" 
 
-    magicNumbers = {
-    'ZERO_SPEED': 0.0,
-    'FORWARD_X_SPEED': 0.2,
-    'SLOW_FORWARD_X_SPEED': 0.1,
-    'CREEP_FORWARD_X_SPEED': 0.05,
-    'BACKWARD_X_SPEED': -0.2,
-    'LEFT_Z_SPEED': 3.5,
-    'RIGHT_Z_SPEED': -3.5,
-    'SLEFT_X_SPEED': 0.05,
-    'SLEFT_Z_SPEED': 0.5,
-    'SRIGHT_X_SPEED': 0.05,
-    'SRIGHT_Z_SPEED': -0.5,
-    'AVOIDRIGHT_X_SPEED': 0.08,
-    'AVOIDRIGHT_Z_SPEED': -0.5,
-    'BLEFT_X_SPEED': -0.1,
-    'BLEFT_Z_SPEED': 0.5,
-    }   
+    # magicNumbers = {
+    # 'ZERO_SPEED': 0.0,
+    # 'FORWARD_X_SPEED': 0.2,
+    # 'SLOW_FORWARD_X_SPEED': 0.1,
+    # 'CREEP_FORWARD_X_SPEED': 0.05,
+    # 'BACKWARD_X_SPEED': -0.2,
+    # 'LEFT_Z_SPEED': 3.5,
+    # 'RIGHT_Z_SPEED': -3.5,
+    # 'SLEFT_X_SPEED': 0.05,
+    # 'SLEFT_Z_SPEED': 0.5,
+    # 'SRIGHT_X_SPEED': 0.05,
+    # 'SRIGHT_Z_SPEED': -0.5,
+    # 'AVOIDRIGHT_X_SPEED': 0.08,
+    # 'AVOIDRIGHT_Z_SPEED': -0.5,
+    # 'BLEFT_X_SPEED': -0.1,
+    # 'BLEFT_Z_SPEED': 0.5,
+    # }
+
     
     def __init__(self):
         super().__init__('action_translator_test')
-        
+        self.magicNumbers = self.loadNumberOverrides()
+
         ##Create publisher and subscriber
         self.action_publisher = self.create_publisher(String, 'actions', 2)
         self.subscriber = self.create_subscription(Twist, 'cmd_vel', self.callback, 10) 
@@ -49,12 +52,22 @@ class ActionTranslatorTest(Node):
 
 
     # ~~~~ TODO: Load Magic NUmbers from CSV ~~~~
-    #def loadNumberOverrides():
-    #    with open('/var/local/magicNumbers.csv') as csvfile:
-    #        reader = csv.reader(csvfile, delimiter=",")
-    #        for row in reader:
-    #            magicNumbers[row[0]] = row[1]
-    #    return magicNumbers
+    # def loadNumberOverrides(self):
+    #     magicNumbers = {}
+    #     # with open('/var/local/magicNumbers.csv') as csvfile:
+    #     with open('') as csvfile:
+    #         reader = csv.reader(csvfile, delimiter=",")
+    #         for row in reader:
+    #             magicNumbers[row[0]] = row[1]
+    #     return magicNumbers
+    def loadNumberOverrides(self):
+        magicNumbers = {}
+        ROOT_DIR = os.getcwd()
+        with open(f'{ROOT_DIR}/src/carleton-mail-delivery-robot/mail_delivery_robot/magicNumbers.csv') as csvfile:
+            reader = csv.reader(csvfile, delimiter=",")
+            for row in reader:
+                magicNumbers[row[0]] = row[1]
+        return magicNumbers
     
     ##Function called when the subcriber hears a message on the cmd_vel topic that actionTranslator publishes to
     def callback(self, twist_message):

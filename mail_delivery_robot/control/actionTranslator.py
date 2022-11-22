@@ -18,33 +18,36 @@ import os
 # This script is meant to take all the action decisions from our reasoner and publish them to the roomba (via cmd_vel)
 
 # ~~~~ DEFAULTS ~~~~~
-magicNumbers = {
-    'ZERO_SPEED': 0.0,
-    'FORWARD_X_SPEED': 0.2,
-    'SLOW_FORWARD_X_SPEED': 0.1,
-    'CREEP_FORWARD_X_SPEED': 0.05,
-    'BACKWARD_X_SPEED': -0.2,
-    'LEFT_Z_SPEED': 3.5,
-    'RIGHT_Z_SPEED': -3.5,
-    'SLEFT_X_SPEED': 0.05,
-    'SLEFT_Z_SPEED': 0.5,
-    'SRIGHT_X_SPEED': 0.05,
-    'SRIGHT_Z_SPEED': -0.5,
-    'AVOIDRIGHT_X_SPEED': 0.08,
-    'AVOIDRIGHT_Z_SPEED': -0.5,
-    'BLEFT_X_SPEED': -0.1,
-    'BLEFT_Z_SPEED': 0.5,
-}
-         
+# magicNumbers = {
+#     'ZERO_SPEED': 0.0,
+#     'FORWARD_X_SPEED': 0.2,
+#     'SLOW_FORWARD_X_SPEED': 0.1,
+#     'CREEP_FORWARD_X_SPEED': 0.05,
+#     'BACKWARD_X_SPEED': -0.2,
+#     'LEFT_Z_SPEED': 3.5,
+#     'RIGHT_Z_SPEED': -3.5,
+#     'SLEFT_X_SPEED': 0.05,
+#     'SLEFT_Z_SPEED': 0.5,
+#     'SRIGHT_X_SPEED': 0.05,
+#     'SRIGHT_Z_SPEED': -0.5,
+#     'AVOIDRIGHT_X_SPEED': 0.08,
+#     'AVOIDRIGHT_Z_SPEED': -0.5,
+#     'BLEFT_X_SPEED': -0.1,
+#     'BLEFT_Z_SPEED': 0.5,
+# }
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
-    with open("/var/local/magicNumbers.csv") as csvfile:
+    magicNumbers = {}
+    ROOT_DIR = os.getcwd()
+    with open(f'{ROOT_DIR}/src/carleton-mail-delivery-robot/mail_delivery_robot/magicNumbers.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
             magicNumbers[row[0]] = row[1]
     return magicNumbers
 
+
+magicNumbers = loadNumberOverrides()
 
 class ActionTranslator(Node):
     def __init__(self):

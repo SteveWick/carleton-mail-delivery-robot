@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # @author: Stephen Wicklund
+import os
 
 # SUBSCRIBER:   preceptions
 # PUBLISHER:    actions
@@ -10,38 +11,43 @@ import time
 import csv
 
 # ~~~~ DEFAULTS ~~~~~
-magicNumbers = {
-    'MAX_TARGET_WALL_DISTANCE': 20.0,
-    'MIN_TARGET_WALL_DISTANCE': 10.0,
-    'MAX_TARGET_WALL_ANGLE': 120.0,
-    'MIN_TARGET_WALL_ANGLE': 60.0,
-    'FIND_WALL_TICKS': 15,
-    'FIND_WALL_SPIN_TICKS': 5,
-    'RIGHT_TURN_TICKS': 3,
-    'RIGHT_TURN_PRE_FORWARD_TICKS': 0,
-    'RIGHT_TURN_POST_FORWARD_TICKS': 5,
-    'LEFT_TURN_TICKS': 3,
-    'COLLISION_BACK_TICKS': 2,
-    'COLLISION_LEFT_TICKS': 5,
-    'COLLISION_RETURN_MIN_TICKS': 6,
-    'COLLISION_WALL_FOLLOW_TICKS': 40,
-    'COLLISION_RETURN_RIGHT_TICKS': 2,
-    'COLLISION_RETURN_FORWARD_TICKS': 4,
-    'COLLISION_RETURN_WALL_FOLLOW_TICKS': 30,
-    'GRAZE_SLEFT_TICKS': 3,
-    'GRAZE_WALL_FOLLOW_TICKS': 3,
-    'TIMER_PERIOD': 0.2,
-    'BACKOFF_TICKS': 2,
-}
+# magicNumbers = {
+#     'MAX_TARGET_WALL_DISTANCE': 20.0,
+#     'MIN_TARGET_WALL_DISTANCE': 10.0,
+#     'MAX_TARGET_WALL_ANGLE': 120.0,
+#     'MIN_TARGET_WALL_ANGLE': 60.0,
+#     'FIND_WALL_TICKS': 15,
+#     'FIND_WALL_SPIN_TICKS': 5,
+#     'RIGHT_TURN_TICKS': 3,
+#     'RIGHT_TURN_PRE_FORWARD_TICKS': 0,
+#     'RIGHT_TURN_POST_FORWARD_TICKS': 5,
+#     'LEFT_TURN_TICKS': 3,
+#     'COLLISION_BACK_TICKS': 2,
+#     'COLLISION_LEFT_TICKS': 5,
+#     'COLLISION_RETURN_MIN_TICKS': 6,
+#     'COLLISION_WALL_FOLLOW_TICKS': 40,
+#     'COLLISION_RETURN_RIGHT_TICKS': 2,
+#     'COLLISION_RETURN_FORWARD_TICKS': 4,
+#     'COLLISION_RETURN_WALL_FOLLOW_TICKS': 30,
+#     'GRAZE_SLEFT_TICKS': 3,
+#     'GRAZE_WALL_FOLLOW_TICKS': 3,
+#     'TIMER_PERIOD': 0.2,
+#     'BACKOFF_TICKS': 2,
+# }
 
 
 # ~~~~ Load overrides ~~~~
 def loadNumberOverrides():
-    with open('/var/local/magicNumbers.csv') as csvfile:
+    magicNumbers = {}
+    ROOT_DIR = os.getcwd()
+    with open(f'{ROOT_DIR}/src/carleton-mail-delivery-robot/mail_delivery_robot/magicNumbers.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=",")
         for row in reader:
             magicNumbers[row[0]] = row[1]
     return magicNumbers
+
+
+magicNumbers = loadNumberOverrides()
 
 
 class DriverStateMachine:
