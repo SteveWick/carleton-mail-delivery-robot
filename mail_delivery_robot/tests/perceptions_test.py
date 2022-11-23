@@ -35,17 +35,43 @@ class PerceptionsTest(Node):
 
 
     ##Function called when the subcriber hears a message on the actions topic that preceptions publishes to
-    #TODO using the additional sensors to stimulate the other types of messages
-    # forward, sleft, sright, right, creepForward, backward
+    # forward, sleft, sright, right,
     def callback(self, data):
         ##Check if returned values from robot_driver are as expected
-        if (data.data == 'forward'):
-            self.get_logger().info('TEST 1 PASSED')
-            self.test_count = 1 
-        elif (data.data == 'right'):
-            self.get_logger().info('TEST 2 PASSED')
-            self.test_count = 2 
-        self.get_logger().info(data.data)
+       
+        
+        #Testing with distance = 12.3cm, angle = 78.9 degrees
+        if(self.test_count == 0):
+            self.get_logger().info("distance = 12.3cm, angle = 78.9 degrees. Expected = forward, Actual = " + data.data)
+            if (data.data == 'forward'):
+                self.get_logger().info('TEST 1 PASSED')
+            else:
+                self.get_logger().info('TEST 1 FAILED')
+        #Testing with distance = 35.3cm, angle = 78.9 degrees    
+        elif(self.test_count == 1):
+            self.get_logger().info("distance = 35.3cm, angle = 78.9 degrees. Expected = right, Actual = " + data.data)
+            if (data.data == 'right'):
+                self.get_logger().info('TEST 2 PASSED')
+            else:
+                self.get_logger().info('TEST 2 FAILED')
+        #Testing with distance = 15cm, angle = 135 degrees
+        # Expecting that an angle greater than 80 degrees means it is heading towards the wall, therefore sleft action should be received 
+        elif(self.test_count == 2):
+            self.get_logger().info("distance = 15cm, angle = 135 degrees. Expected = sleft, Actual = " + data.data)
+            if (data.data == 'sleft'):
+                self.get_logger().info('TEST 3 PASSED')
+            else:
+                self.get_logger().info('TEST 3 FAILED')
+        #Testing with distance = 15cm, angle = 25 degrees
+        # Expecting that an angle less than 80 degrees means it is heading away from the wall, therefore sright action should be received 
+        elif(self.test_count == 3):
+            self.get_logger().info("distance = 15cm, angle = 25 degrees. Expected = sleft, Actual = " + data.data)
+            if (data.data == 'sleft'):
+                self.get_logger().info('TEST 4 PASSED')
+            else:
+                self.get_logger().info('TEST 4 FAILED')
+                
+        self.test_count += 1 
 
 
     ##Test function that publishes the test data for testing
@@ -55,15 +81,19 @@ class PerceptionsTest(Node):
 
         #Run test one - Publishes command to robotDriver topic
         if self.test_count == 0:
-            #self.get_logger().info("Sending distance=12.3cm and angle=78.9degrees")
             data.data = "12.3,78.9"
             self.perceptions_publisher.publish(data)
         elif self.test_count == 1:
-            #self.get_logger().info("Sending distance=35.3cm and angle=78.9degrees")
             data.data = "35.3,78.9"
             self.perceptions_publisher.publish(data)
+        elif self.test_count == 2:
+            data.data = "15.3,135"
+            self.perceptions_publisher.publish(data)
+        elif self.test_count == 3:
+            data.data = "15.3,25"
+            self.perceptions_publisher.publish(data)
         else:
-            self.get_logger().info("TESTS PASSED SUCESSFULLY")
+            self.get_logger().info("TESTS FINISHED")
             #Exit
             self.destroy_node()
 
