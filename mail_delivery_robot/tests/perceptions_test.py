@@ -49,8 +49,8 @@ class PerceptionsTest(Node):
                 self.get_logger().info('TEST 1 FAILED')
         #Testing with distance = 35.3cm, angle = 78.9 degrees    
         elif(self.test_count == 1):
-            self.get_logger().info("distance = 35.3cm, angle = 78.9 degrees. Expected = right, Actual = " + data.data)
-            if (data.data == 'right'):
+            self.get_logger().info("distance = 35.3cm, angle = 78.9 degrees. Expected = sright, Actual = " + data.data)
+            if (data.data == 'sright'):
                 self.get_logger().info('TEST 2 PASSED')
             else:
                 self.get_logger().info('TEST 2 FAILED')
@@ -62,11 +62,11 @@ class PerceptionsTest(Node):
                 self.get_logger().info('TEST 3 PASSED')
             else:
                 self.get_logger().info('TEST 3 FAILED')
-        #Testing with distance = 15cm, angle = 25 degrees
+        # Testing with distance = 15cm, angle = 25 degrees
         # Expecting that an angle less than 80 degrees means it is heading away from the wall, therefore sright action should be received 
         elif(self.test_count == 3):
-            self.get_logger().info("distance = 15cm, angle = 25 degrees. Expected = sleft, Actual = " + data.data)
-            if (data.data == 'sleft'):
+            self.get_logger().info("distance = 15cm, angle = 25 degrees. Expected = sright, Actual = " + data.data)
+            if (data.data == 'sright'):
                 self.get_logger().info('TEST 4 PASSED')
             else:
                 self.get_logger().info('TEST 4 FAILED')

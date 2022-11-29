@@ -34,13 +34,11 @@ class DriverStateMachine:
         return self.currentState.run(distanceFlags)
 
     def next(self, distanceFlags, bumperState):
-        self.currentState = self.currentState.next(distanceFlags, captainRequest, bumperState)
+        self.currentState = self.currentState.next(distanceFlags, bumperState)
 
 
 class DriverState:
-    counter = 0
-
-    def run(self):
+    def run(self, distanceFlags):
         assert 0, "Must be implemented"
 
     def next(self, distanceFlags, bumperState):
@@ -51,7 +49,7 @@ class DriverState:
 
 # Assigned to Jake
 class Docked(DriverState):
-    def run(self):
+    def run(self, distanceFlags):
         action = String()
         return action
 
@@ -63,7 +61,7 @@ class Docked(DriverState):
 
 # Assigned to Jake
 class FindWall(DriverState):
-    def run(self):
+    def run(self, distanceFlags):
         action = String()
         return action
 
@@ -75,8 +73,17 @@ class FindWall(DriverState):
 
 # Assigned to Chase
 class WallFollowing(DriverState):
-    def run(self):
+    def run(self, distanceFlags):
         action = String()
+        # if robot is too far from the wall or is turned away, turn right
+        if ((distanceFlags["tooFar"] or distanceFlags["tightAngle"])):
+            action.data = "sright"
+        # if robot is too close to the wall or is turned towards it, turn left
+        elif ((distanceFlags["tooClose"] or distanceFlags["wideAngle"])):
+            action.data = "sleft"
+        # if all distance flags are good, continue forward
+        else:
+            action.data = "forward"
         return action
 
     def next(self, distanceFlags, bumperState):
@@ -84,9 +91,10 @@ class WallFollowing(DriverState):
 
     def toString(self):
         return "WallFollowing"
+
 # Assigned to Chase
 class IntersectionHandling(DriverState):
-    def run(self):
+    def run(self, distanceFlags):
         action = String()
         return action
 
@@ -95,9 +103,10 @@ class IntersectionHandling(DriverState):
 
     def toString(self):
         return "IntersectionHandling"
+
 # Assigned to Chase
 class DestinationReached(DriverState):
-    def run(self):
+    def run(self, distanceFlags):
         action = String()
         return action
 
@@ -106,9 +115,10 @@ class DestinationReached(DriverState):
 
     def toString(self):
         return "DestinationReached"
+
 # Assigned to Chase
 class CollisionHandling(DriverState):
-    def run(self):
+    def run(self, distanceFlags):
         action = String()
         return action
     def next(self, distanceFlags, bumperState):
@@ -124,7 +134,6 @@ DriverStateMachine.WallFollowing = WallFollowing()
 DriverStateMachine.IntersectionHandling = IntersectionHandling()
 DriverStateMachine.DestinationReached = DestinationReached()
 DriverStateMachine.CollisionHandling = CollisionHandling()
-
 
 class RobotDriver(Node):
     def __init__(self):
@@ -153,7 +162,7 @@ class RobotDriver(Node):
         self.timer = self.create_timer(timer_period, self.determineAction)
 
         # initialize first state TODO
-        self.driverStateMachine = DriverStateMachine()
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.WallFollowing)
 
     def determineAction(self):
         # get current action based on current state's run command
@@ -175,6 +184,12 @@ class RobotDriver(Node):
 
         if (DEBUG_MODE):
             self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
+    
+    def updateBumperState(self, data):
+        self.bumperState = data.data
+        self.driverStateMachine.next(self.distanceFlags, self.bumperState)
+        if (DEBUG_MODE):
+            self.get_logger().debug("Bumper State: " + self.bumperState)
 
 
 def main():
