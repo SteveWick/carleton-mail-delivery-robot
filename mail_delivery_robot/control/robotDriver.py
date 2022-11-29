@@ -47,14 +47,24 @@ class DriverState:
     def toString(self):
         return ""
 
-# Assigned to Jake
+# Assigned to Jake # TODO Create flag for undock message, currently set temp to "undock"
 class Docked(DriverState):
     def run(self, distanceFlags):
         action = String()
+        temp = "undock"
+        if temp == "undock":
+            action.data = "undock"
+        else:
+            action.data = "stop"
         return action
 
     def next(self, distanceFlags, bumperState):
-        pass
+        temp = "undock"
+        if temp == "undock":
+            # TODO Pathfinder should either be called or setup by this point
+            return DriverStateMachine.FindWall
+        else:
+            return DriverStateMachine.Docked
 
     def toString(self):
         return "Docked"
@@ -63,10 +73,18 @@ class Docked(DriverState):
 class FindWall(DriverState):
     def run(self, distanceFlags):
         action = String()
+        action.data = "sright"
         return action
 
     def next(self, distanceFlags, bumperState):
-        pass
+        # if robot is too close to the wall or is turned towards it, turn left
+        if ((distanceFlags["tooClose"] or distanceFlags["wideAngle"])):
+            return DriverStateMachine.WallFollowing
+        # if all distance flags are good, continue forward
+        elif (bumperState != "unpressed"):
+            return DriverStateMachine.CollisionHandling
+        else:
+            return DriverStateMachine.FindWall
 
     def toString(self):
         return "FindWall"
