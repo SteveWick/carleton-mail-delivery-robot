@@ -49,6 +49,7 @@ class DriverState:
 
 # Assigned to Jake # TODO Create flag for undock message, currently set temp to "undock"
 class Docked(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         temp = "undock"
@@ -71,6 +72,7 @@ class Docked(DriverState):
 
 # Assigned to Jake
 class FindWall(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         action.data = "sright"
@@ -91,6 +93,7 @@ class FindWall(DriverState):
 
 # Assigned to Chase
 class WallFollowing(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         # if robot is too far from the wall or is turned away, turn right
@@ -112,6 +115,7 @@ class WallFollowing(DriverState):
 
 # Assigned to Chase
 class IntersectionHandling(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         return action
@@ -124,6 +128,7 @@ class IntersectionHandling(DriverState):
 
 # Assigned to Chase
 class DestinationReached(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         return action
@@ -139,6 +144,7 @@ class CollisionHandling(DriverState):
     def run(self, distanceFlags):
         action = String()
         return action
+
     def next(self, distanceFlags, bumperState):
         pass
 
