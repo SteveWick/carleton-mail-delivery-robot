@@ -34,7 +34,7 @@ class DriverStateMachine:
         return self.currentState.run(distanceFlags)
 
     def next(self, distanceFlags, bumperState):
-        self.currentState = self.currentState.next(distanceFlags, captainRequest, bumperState)
+        self.currentState = self.currentState.next(distanceFlags, bumperState)
 
 
 class DriverState:
@@ -51,40 +51,55 @@ class DriverState:
 
 class Docked(DriverState):
     def run(self):
+        action = String()
+        return action
 
     def next(self, distanceFlags, bumperState):
+        pass
 
     def toString(self):
         return "Docked"
 
 class FindWall(DriverState):
     def run(self):
+        action = String()
+        return action
 
     def next(self, distanceFlags, bumperState):
+        pass
 
     def toString(self):
         return "FindWall"
 
 class WallFollowing(DriverState):
     def run(self):
+        action = String()
+        return action
 
     def next(self, distanceFlags, bumperState):
+        pass
 
     def toString(self):
         return "WallFollowing"
 
 class IntersectionHandling(DriverState):
     def run(self):
+        action = String()
+        return action
 
     def next(self, distanceFlags, bumperState):
+        pass
 
     def toString(self):
         return "IntersectionHandling"
 
 class DestinationReached(DriverState):
     def run(self):
+        action = String()
+        return action
 
     def next(self, distanceFlags, bumperState):
+        pass
 
     def toString(self):
         return "DestinationReached"
@@ -93,7 +108,9 @@ class CollisionHandling(DriverState):
     def run(self):
         action = String()
         return action
+
     def next(self, distanceFlags, bumperState):
+        pass
 
     def toString(self):
         return "CollisionHandling"
