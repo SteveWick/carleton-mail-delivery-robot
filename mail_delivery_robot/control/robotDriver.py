@@ -49,6 +49,7 @@ class DriverState:
     def toString(self):
         return ""
 
+# Assigned to Jake
 class Docked(DriverState):
     def run(self):
         action = String()
@@ -60,6 +61,7 @@ class Docked(DriverState):
     def toString(self):
         return "Docked"
 
+# Assigned to Jake
 class FindWall(DriverState):
     def run(self):
         action = String()
@@ -71,6 +73,7 @@ class FindWall(DriverState):
     def toString(self):
         return "FindWall"
 
+# Assigned to Chase
 class WallFollowing(DriverState):
     def run(self):
         action = String()
@@ -81,7 +84,7 @@ class WallFollowing(DriverState):
 
     def toString(self):
         return "WallFollowing"
-
+# Assigned to Chase
 class IntersectionHandling(DriverState):
     def run(self):
         action = String()
@@ -92,7 +95,7 @@ class IntersectionHandling(DriverState):
 
     def toString(self):
         return "IntersectionHandling"
-
+# Assigned to Chase
 class DestinationReached(DriverState):
     def run(self):
         action = String()
@@ -103,7 +106,7 @@ class DestinationReached(DriverState):
 
     def toString(self):
         return "DestinationReached"
-
+# Assigned to Chase
 class CollisionHandling(DriverState):
     def run(self):
         action = String()
