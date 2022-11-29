@@ -122,6 +122,7 @@ DriverStateMachine.IntersectionHandling = IntersectionHandling()
 DriverStateMachine.DestinationReached = DestinationReached()
 DriverStateMachine.CollisionHandling = CollisionHandling()
 
+
 class RobotDriver(Node):
     def __init__(self):
         super().__init__('robot_driver')
