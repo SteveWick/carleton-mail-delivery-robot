@@ -47,32 +47,53 @@ class DriverState:
     def toString(self):
         return ""
 
-# Assigned to Jake
+# Assigned to Jake # TODO Create flag for undock message, currently set temp to "undock"
 class Docked(DriverState):
+
     def run(self, distanceFlags):
         action = String()
+        temp = "undock"
+        if temp == "undock":
+            action.data = "undock"
+        else:
+            action.data = "stop"
         return action
 
     def next(self, distanceFlags, bumperState):
-        pass
+        temp = "undock"
+        if temp == "undock":
+            # TODO Pathfinder should either be called or setup by this point
+            return DriverStateMachine.FindWall
+        else:
+            return DriverStateMachine.Docked
 
     def toString(self):
         return "Docked"
 
 # Assigned to Jake
 class FindWall(DriverState):
+
     def run(self, distanceFlags):
         action = String()
+        action.data = "sright"
         return action
 
     def next(self, distanceFlags, bumperState):
-        pass
+        # if robot is too close to the wall or is turned towards it, turn left
+        if ((distanceFlags["tooClose"] or distanceFlags["wideAngle"])):
+            return DriverStateMachine.WallFollowing
+        # if all distance flags are good, continue forward
+        elif (bumperState != "unpressed"):
+            return DriverStateMachine.CollisionHandling
+        else:
+            return DriverStateMachine.FindWall
 
     def toString(self):
         return "FindWall"
 
 # Assigned to Chase
 class WallFollowing(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         # if robot is too far from the wall or is turned away, turn right
@@ -94,6 +115,7 @@ class WallFollowing(DriverState):
 
 # Assigned to Chase
 class IntersectionHandling(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         return action
@@ -106,6 +128,7 @@ class IntersectionHandling(DriverState):
 
 # Assigned to Chase
 class DestinationReached(DriverState):
+
     def run(self, distanceFlags):
         action = String()
         return action
@@ -121,6 +144,7 @@ class CollisionHandling(DriverState):
     def run(self, distanceFlags):
         action = String()
         return action
+
     def next(self, distanceFlags, bumperState):
         pass
 
