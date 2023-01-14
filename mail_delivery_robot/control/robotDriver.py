@@ -173,7 +173,9 @@ class RobotDriver(Node):
             "tightAngle": False,
             "wideAngle": False
         }
-
+        # initialize first state TODO
+        self.driverStateMachine = DriverStateMachine(DriverStateMachine.WallFollowing)
+        
         # configure publisher and subscribers
         self.actionPublisher = self.create_publisher(String, 'actions', 2)
         self.IRSubscriber = self.create_subscription(String, 'preceptions', self.updateDistance, 10)
@@ -185,8 +187,7 @@ class RobotDriver(Node):
         timer_period = float(magicNumbers['TIMER_PERIOD'])  # Seconds
         self.timer = self.create_timer(timer_period, self.determineAction)
 
-        # initialize first state TODO
-        self.driverStateMachine = DriverStateMachine(DriverStateMachine.WallFollowing)
+
 
     def determineAction(self):
         # get current action based on current state's run command
