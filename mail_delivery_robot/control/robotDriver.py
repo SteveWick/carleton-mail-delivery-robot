@@ -30,18 +30,18 @@ class DriverStateMachine:
     def __init__(self, initialState):
         self.currentState = initialState
 
-    def handleNewDistanceEvent(self, feedback_value, actionPublisher):
-        self.currentState = self.currentState.handleNewDistanceEvent(feedback_value, actionPublisher)
+    def handleNewDistanceEvent(self, data, actionPublisher):
+        self.currentState = self.currentState.handleNewDistanceEvent(data, actionPublisher)
 
 class DriverState:
-    def handleNewDistanceEvent(self, feedback_value, actionPublisher):
+    def handleNewDistanceEvent(self, data, actionPublisher):
         assert 0, "Must be implemented"
 
     def toString(self):
         return ""
 
 class FindWall(DriverState):
-    def handleNewDistanceEvent(self, feedback_value, actionPublisher):
+    def handleNewDistanceEvent(self, data, actionPublisher):
         #found wall so change state
         #TODO this should check that a wall is actually found before switching state.
         return WallFollowing()
@@ -50,9 +50,9 @@ class FindWall(DriverState):
         return "FindWall"
 
 class WallFollowing(DriverState):
-    def handleNewDistanceEvent(self, feedback_value, actionPublisher):
+    def handleNewDistanceEvent(self, data, actionPublisher):
         action = String()
-        action.data = feedback_value
+        action = data
         actionPublisher.publish(action)
         return self
 
@@ -78,15 +78,14 @@ class RobotDriver(Node):
 
     # update the robots distance flags based on data recieved from the IR sensors
     def updateIRSensor(self, data):
-
+        #verify data type
         if (data.data != "-1"):
             #self.distance = data.data.split(",")[0]
             #self.angle = data.data.split(",")[1]
 
-            feedback_value = data.data
             #Make sure to pass it through the decode function first. actionTranslater will have to change in order to be able to handle this new message.
-
-            self.driverStateMachine.handleNewDistanceEvent(feedback_value, self.actionPublisher)
+            # this is a String in the form 'target_distance:current_distance:current_angle'
+            self.driverStateMachine.handleNewDistanceEvent(data, self.actionPublisher)
 
         if (DEBUG_MODE):
             self.get_logger().info("Distance: " + str(self.distance) + "Angle: " + str(self.angle))
