@@ -45,11 +45,11 @@ class IRSensor(Node):
         calc = String()
         
         #update pid controller and get output
-        feedback = calculate()[0]
+        feedback, angle = calculate()
         self.pid_controller.update(feedback)
         output = self.pid_controller.output
 
-        calc.data = str(output)
+        calc.data = str(output) + ':' + str(feedback) + ':' + str(angle)
 
         self.get_logger().debug('Publishing: "%s"' % calc)
         if calc.data == -1:
