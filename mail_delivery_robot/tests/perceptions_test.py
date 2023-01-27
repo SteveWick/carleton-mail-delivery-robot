@@ -39,7 +39,6 @@ class PerceptionsTest(Node):
     def callback(self, data):
         ##Check if returned values from robot_driver are as expected
        
-        
         #Testing with distance = 12.3cm, angle = 78.9 degrees
         if(self.test_count == 0):
             self.get_logger().info("distance = 12.3cm, angle = 78.9 degrees. Expected = forward, Actual = " + data.data)
@@ -57,7 +56,7 @@ class PerceptionsTest(Node):
         #Testing with distance = 15cm, angle = 135 degrees
         # Expecting that an angle greater than 80 degrees means it is heading towards the wall, therefore sleft action should be received 
         elif(self.test_count == 2):
-            self.get_logger().info("distance = 15cm, angle = 135 degrees. Expected = sleft, Actual = " + data.data)
+            self.get_logger().info("distance = 15.3cm, angle = 135 degrees. Expected = sleft, Actual = " + data.data)
             if (data.data == 'sleft'):
                 self.get_logger().info('TEST 3 PASSED')
             else:
@@ -65,7 +64,7 @@ class PerceptionsTest(Node):
         # Testing with distance = 15cm, angle = 25 degrees
         # Expecting that an angle less than 80 degrees means it is heading away from the wall, therefore sright action should be received 
         elif(self.test_count == 3):
-            self.get_logger().info("distance = 15cm, angle = 25 degrees. Expected = sright, Actual = " + data.data)
+            self.get_logger().info("distance = 15.3cm, angle = 25 degrees. Expected = sright, Actual = " + data.data)
             if (data.data == 'sright'):
                 self.get_logger().info('TEST 4 PASSED')
             else:
