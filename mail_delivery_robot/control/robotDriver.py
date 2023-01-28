@@ -46,10 +46,12 @@ class FindWall(DriverState):
         #TODO this should check that a wall is actually found before switching state.
         return WallFollowing()
 
+
     def toString(self):
         return "FindWall"
 
 class WallFollowing(DriverState):
+
     def handleNewDistanceEvent(self, data, actionPublisher):
         action = String()
         action = data
@@ -72,9 +74,9 @@ class RobotDriver(Node):
         self.bumperEventSubscriber = self.create_subscription(String, 'bumpEvent', self.updateBumperState, 10)
         # TODO These will be implemented in future commits
         # self.mapSubscriber = self.create_subscription(String, 'navigationMap', self.updateMapState, 10)
-
         # initialize first state
         self.driverStateMachine = DriverStateMachine(FindWall())
+
 
     # update the robots distance flags based on data recieved from the IR sensors
     def updateIRSensor(self, data):

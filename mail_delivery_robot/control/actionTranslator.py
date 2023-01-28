@@ -36,8 +36,8 @@ class ActionTranslator(Node):
         super().__init__('action_translator')
         self.drivePublisher = self.create_publisher(Twist, 'cmd_vel', 2)
         #unimplemented docking behaviour 
-            #self.undockPublisher = self.create_publisher(Empty, 'dock', 1)
-        # self.dockPublisher = self.create_publisher(Empty, 'undock', 1)
+        self.undockPublisher = self.create_publisher(Empty, 'dock', 1)
+        self.dockPublisher = self.create_publisher(Empty, 'undock', 1)
         
         self.subscription = self.create_subscription(String, 'actions', self.decodeAction, 10)
 
@@ -45,15 +45,20 @@ class ActionTranslator(Node):
     def decodeAction(self, data):
         action = str(data.data)
         self.get_logger().info(action)
-        actionMessage = Twist()  # the mess
+        emptyMessage = Empty
 
         # Get the parameters
         #(drivePublisher, dockPublisher, undockPublisher) = args
+        if action == "dock":
+            self.dockPublisher.publish(emptyMessage)
+        elif action == "undock":
+            self.undockPublisher.publish(emptyMessage)
+        else:
+            # actionMessage = Twist()  # the mess
+            # handle basic movement commands from actions topic
+            actionMessage = getTwistMesg(action)
 
-        # handle basic movement commands from actions topic
-        actionMessage = getTwistMesg(action)
-    
-        self.drivePublisher.publish(actionMessage)
+            self.drivePublisher.publish(actionMessage)
 
 
 # Get a Twist message which consists of a linear and angular component which can be negative or positive.
