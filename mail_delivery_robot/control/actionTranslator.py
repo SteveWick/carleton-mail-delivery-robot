@@ -5,7 +5,7 @@
 # SUBSCRIBER:   String object from 'actions' node
 # PUBLISHER:    Twist object to 'cmd_vel' node
 #               null object to 'dock' node
-
+import math
 import rclpy
 from rclpy.node import Node
 import re
@@ -47,6 +47,13 @@ class ActionTranslator(Node):
         self.get_logger().info(action)
         emptyMessage = Empty
 
+        target_distance, current_distance, current_angle = action.split(":")
+        time_interval = float(magicNumbers['TIMER_PERIOD'])
+
+        message = Twist()
+        message.angular.z = angular_speed(current_angle, current_distance, target_distance, time_interval)
+        message.linear.x = float(magicNumbers['FORWARD_X_SPEED']) 
+        
         # Get the parameters
         #(drivePublisher, dockPublisher, undockPublisher) = args
         if action == "dock":
@@ -56,9 +63,7 @@ class ActionTranslator(Node):
         else:
             # actionMessage = Twist()  # the mess
             # handle basic movement commands from actions topic
-            actionMessage = getTwistMesg(action)
-
-            self.drivePublisher.publish(actionMessage)
+            self.drivePublisher.publish(message)
 
 
 # Get a Twist message which consists of a linear and angular component which can be negative or positive.
@@ -71,44 +76,12 @@ class ActionTranslator(Node):
 #
 # Limits:
 # -0.5 <= linear.x <= 0.5 and -4.25 <= angular.z <= 4.25 (4rads = 45deg)
-def getTwistMesg(action):
-    message = Twist()
 
-    if action == "forward":
-        message.linear.x = float(magicNumbers['FORWARD_X_SPEED'])
-        message.angular.z = float(magicNumbers['ZERO_SPEED'])
-    elif action == "slowForward":
-        message.linear.x = float(magicNumbers['SLOW_FORWARD_X_SPEED'])
-        message.angular.z = float(magicNumbers['ZERO_SPEED'])
-    elif action == "creepForward":
-        message.linear.x = float(magicNumbers['CREEP_FORWARD_X_SPEED'])
-        message.angular.z = float(magicNumbers['ZERO_SPEED'])
-    elif action == "backward":
-        message.linear.x = float(magicNumbers['BACKWARD_X_SPEED'])
-        message.linear.z = float(magicNumbers['ZERO_SPEED'])
-    elif action == "left":
-        message.linear.x = float(magicNumbers['ZERO_SPEED'])
-        message.angular.z = float(magicNumbers['LEFT_Z_SPEED'])
-    elif action == "right":
-        message.linear.x = float(magicNumbers['ZERO_SPEED'])
-        message.angular.z = float(magicNumbers['RIGHT_Z_SPEED'])
-    elif action == "sleft":
-        message.linear.x = float(magicNumbers['SLEFT_X_SPEED'])
-        message.angular.z = float(magicNumbers['SLEFT_Z_SPEED'])
-    elif action == "sright":
-        message.linear.x = float(magicNumbers['SRIGHT_X_SPEED'])
-        message.angular.z = float(magicNumbers['SRIGHT_Z_SPEED'])
-    elif action == "avoidright":
-        message.linear.x = float(magicNumbers['AVOIDRIGHT_X_SPEED'])
-        message.angular.z = float(magicNumbers['AVOIDRIGHT_Z_SPEED'])
-    elif action == "bleft":
-        message.linear.x = float(magicNumbers['BLEFT_X_SPEED'])
-        message.angular.z = float(magicNumbers['BLEFT_Z_SPEED'])
-    elif action == "stop":
-        message.linear.x = float(magicNumbers['ZERO_SPEED'])
-        message.angular.z = float(magicNumbers['ZERO_SPEED'])
-
-    return message
+def angular_speed(current_angle, current_distance, target_distance, time_interval):
+    distance_difference = target_distance - current_distance
+    angle_difference = math.atan2(distance_difference, current_distance) - current_angle
+    angular_speed = angle_difference / time_interval
+    return angular_speed
 
 
 # Main execution
