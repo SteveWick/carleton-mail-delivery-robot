@@ -13,6 +13,8 @@ from rclpy.node import Node
 import sys
 import Adafruit_ADS1x15
 
+TIMER_PERIOD = 0.2 #seconds
+
 
 class IRSensor(Node):
     """
@@ -36,13 +38,19 @@ class IRSensor(Node):
     def __init__(self):
         super().__init__('ir_sensor')
         self.publisher_ = self.create_publisher(String, 'preceptions' , 10)
-        timer_period = 0.2 #Seconds
-        self.timer = self.create_timer(timer_period, self.sendReading)
+        self.pid_controller = PID() #init pid controller
+        self.timer = self.create_timer(TIMER_PERIOD, self.sendReading)
 
     def sendReading(self):
         calc = String()
-        # calc = calculate()
-        calc.data = str(calculate())
+        
+        #update pid controller and get output
+        feedback, angle = calculate()
+        self.pid_controller.update(feedback)
+        output = self.pid_controller.output
+
+        calc.data = str(output) + ':' + str(feedback) + ':' + str(angle)
+
         self.get_logger().debug('Publishing: "%s"' % calc)
         if calc.data == -1:
             pass
@@ -124,14 +132,6 @@ def distance(sensor1_distance, sensor2_distance):
     # a is the distance between where the two censors make contact with the wall
     c = math.sqrt((sensor1_distance ** 2 + sensor2_distance ** 2) - (2 * sensor1_distance * sensor2_distance *
                                                                      math.cos(angle_between_sensors * math.pi / 180)))
-    # h is the height of the triangle
-    h = sensor1_distance * math.sin(angle_between_sensors * math.pi / 180)
-
-    # B is an angle we need to find distance from wall
-    B = math.asin(h / c)
-
-    # this is to get the robots actual distance from the wall it is following
-    distance_from_wall = sensor2_distance * math.sin(B)
 
     # this is to find angle A, which tells us if the robot is moving towards or away from the wall
     # an obtuse angle (greater than 90 degrees) means it is moving away
@@ -139,10 +139,100 @@ def distance(sensor1_distance, sensor2_distance):
     angle_between_wall = math.acos(
         (sensor1_distance ** 2 + c ** 2 - sensor2_distance ** 2) / (2 * sensor1_distance * c)) * 180 / math.pi
 
-    distance_angle_calc = str(abs(distance_from_wall)) + "," + str(angle_between_wall)
-    print(distance_angle_calc)
+    distance_from_wall = sensor1_distance * math.sin(angle_between_wall * math.pi / 180)
+
+    distance_angle_calc = (abs(distance_from_wall),angle_between_wall)
     return distance_angle_calc
     
+class PID:
+    """PID Controller
+    """
+
+    def __init__(self, P=1.0, I=0.0, D=0.0, current_time=None):
+
+        self.Kp = P
+        self.Ki = I
+        self.Kd = D
+
+        self.sample_time = 0.00
+        self.current_time = current_time if current_time is not None else time.time()
+        self.last_time = self.current_time
+
+        self.clear()
+
+    def clear(self):
+        """Clears PID computations and coefficients"""
+        self.SetPoint = 0.0
+
+        self.PTerm = 0.0
+        self.ITerm = 0.0
+        self.DTerm = 0.0
+        self.last_error = 0.0
+
+        # Windup Guard
+        self.int_error = 0.0
+        self.windup_guard = 20.0
+
+        self.output = 0.0
+
+    def update(self, feedback_value, current_time=None):
+        """Calculates PID value for given reference feedback"""
+        error = self.SetPoint - feedback_value
+
+        self.current_time = current_time if current_time is not None else time.time()
+        delta_time = self.current_time - self.last_time
+        delta_error = error - self.last_error
+
+        if (delta_time >= self.sample_time):
+            self.PTerm = self.Kp * error
+            self.ITerm += error * delta_time
+
+            if (self.ITerm < -self.windup_guard):
+                self.ITerm = -self.windup_guard
+            elif (self.ITerm > self.windup_guard):
+                self.ITerm = self.windup_guard
+
+            self.DTerm = 0.0
+            if delta_time > 0:
+                self.DTerm = delta_error / delta_time
+
+            # Remember last time and last error for next calculation
+            self.last_time = self.current_time
+            self.last_error = error
+
+            self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
+
+    def setKp(self, proportional_gain):
+        """Determines how aggressively the PID reacts to the current error with setting Proportional Gain"""
+        self.Kp = proportional_gain
+
+    def setKi(self, integral_gain):
+        """Determines how aggressively the PID reacts to the current error with setting Integral Gain"""
+        self.Ki = integral_gain
+
+    def setKd(self, derivative_gain):
+        """Determines how aggressively the PID reacts to the current error with setting Derivative Gain"""
+        self.Kd = derivative_gain
+
+    def setWindup(self, windup):
+        """Integral windup, also known as integrator windup or reset windup,
+        refers to the situation in a PID feedback controller where
+        a large change in setpoint occurs (say a positive change)
+        and the integral terms accumulates a significant error
+        during the rise (windup), thus overshooting and continuing
+        to increase as this accumulated error is unwound
+        (offset by errors in the other direction).
+        The specific problem is the excess overshooting.
+        """
+        self.windup_guard = windup
+
+    def setSampleTime(self, sample_time):
+        """PID that should be updated at a regular interval.
+        Based on a pre-determined sampe time, the PID decides if it should compute or return immediately.
+        """
+        self.sample_time = sample_time
+
+
 def main():
     rclpy.init()
     irsensor = IRSensor()
